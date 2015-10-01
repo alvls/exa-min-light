@@ -21,7 +21,7 @@ bool operator<(const TSearchInterval& i1,const TSearchInterval& i2){return (i1.x
 // ------------------------------------------------------------------------------------------------
 // TSearchData Methods
 // ------------------------------------------------------------------------------------------------
-TSearchData::TSearchData(TParameters _parameters, int _NumOfFuncs,int _MaxSize) : parameters(_parameters)
+TSearchData::TSearchData(/*TParameters _parameters, */int _NumOfFuncs,int _MaxSize)// : parameters(_parameters)
 {
 	MaxSize = _MaxSize;
 	Count = 0;
@@ -31,7 +31,7 @@ TSearchData::TSearchData(TParameters _parameters, int _NumOfFuncs,int _MaxSize) 
 	NumOfFuncs = _NumOfFuncs;
 	for(int i=0;i<NumOfFuncs;i++)
 	{
-		M[i] = parameters.M;			//Начальное значение оценок констант Липшица равно 1 
+		M[i] = 1; //parameters.M;			//Начальное значение оценок констант Липшица равно 1 
 		Z[i] = MaxDouble;	//Начальное значение минимумов - максимальное
 	}
 }
@@ -52,7 +52,7 @@ void TSearchData::Clear()
 	ClearQueue();
 	for(int i=0;i<NumOfFuncs;i++)
 	{
-		M[i] = parameters.M;			//Начальное значение оценок констант Липшица равно 1 
+		M[i] = 1;//parameters.M;			//Начальное значение оценок констант Липшица равно 1 
 		Z[i] = MaxDouble;	//Начальное значение минимумов - максимальное
 	}
 }
@@ -163,7 +163,7 @@ TTreeNode* TSearchData::Insert(TTreeNode *p, TSearchInterval &pInterval)
 
 // ------------------------------------------------------------------------------------------------
 //TTreeNode* TSearchData::Find(Extended x)
-TTreeNode* TSearchData::Find(TTreeNode *p, Extended x)
+TTreeNode* TSearchData::Find(TTreeNode *p, double x)
 {
   TTreeNode *res;
   if (!p)
@@ -216,7 +216,7 @@ void TSearchData::UpdateInterval(TSearchInterval &pInterval)
 
 // ------------------------------------------------------------------------------------------------
 //  TSearchInterval* GetIntervalByX(Extended x);
-TSearchInterval* TSearchData::GetIntervalByX(Extended x)
+TSearchInterval* TSearchData::GetIntervalByX(double x)
 {
   pCur = Find(pRoot, x);
   if (pCur)

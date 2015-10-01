@@ -17,10 +17,10 @@
 #define __DATA_H__
 
 #include "common.h"
-#include "extended.h"
+//#include "extended.h"
 #include "queue.h"
 #include <stack>
-#include "parameters.h"
+//#include "parameters.h"
 //#include <vector>
 #include <string.h>
 using namespace std;
@@ -28,7 +28,7 @@ using namespace std;
 // ------------------------------------------------------------------------------------------------
 struct TTrial
 {
-  Extended  x;
+  double x;
   double y[MaxDim];
   double FuncValues[MaxNumOfFunc];
   int index;
@@ -38,8 +38,8 @@ struct TTrial
 // ------------------------------------------------------------------------------------------------
 struct TSearchInterval
 {
-  Extended xl;   // левая граница интервала
-  Extended xr;   // правая граница интервала
+  double xl;   // левая граница интервала
+  double xr;   // правая граница интервала
 //  double   dx;   // обычная длина
   double   delta;// "гельдеровская" длина
   double   zl;   // значение последнего вычисленного функционала в xl
@@ -47,7 +47,7 @@ struct TSearchInterval
   double   zr;   // значение последнего вычисленного функционала в xr
   int      izr;  // индекс последнего вычисленного фукнционала в xr
   int      ind;  // номер итерации
-  int	   K;    // число "вложенных" итераций
+  int      K;    // число "вложенных" итераций
   double   R;    // характеристика интервала (xl, xr)
   double   locR; // локальная характеристика интервала (xl, xr)
   double   *z;   // значения вычисленных функционалов в izl, кол-во - izl + 1
@@ -123,18 +123,18 @@ protected:
   TTreeNode* Insert(TTreeNode *p, TSearchInterval &pInterval);
   // поиск узла с нужным x по левой границе интервала (рекурсивный)
 //  TTreeNode* Find(Extended x);
-  TTreeNode* Find(TTreeNode *p, Extended x);
+  TTreeNode* Find(TTreeNode *p, double x);
   // поиск узла по правой границе интервала
 //  TTreeNode* FindR(TTreeNode *p, Extended x);
-  TParameters parameters; //параметры метода
+//  TParameters parameters; //параметры метода
 public:
-  TSearchData(TParameters _parameters, int _NumOfFuncs, int _MaxSize = DefaultSearchDataSize);
+  TSearchData(/*TParameters _parameters,*/ int _NumOfFuncs, int _MaxSize = DefaultSearchDataSize);
   ~TSearchData();
   void Clear();
   TSearchInterval* InsertInterval(TSearchInterval &pInterval); // новый интервал (по xl)
   void UpdateInterval(TSearchInterval &pInterval); // обновление интервала (по xl)
 //  TSearchInterval* GetIntervalByX(Extended x);
-  TSearchInterval* GetIntervalByX(Extended x);
+  TSearchInterval* GetIntervalByX(double x);
   // Получение интервала с максимальной хар-кой. Интервал берется из очереди. Если очередь пуста,
   //   то сначала будет вызван Refill()
   TSearchInterval* GetIntervalWithMaxR();
