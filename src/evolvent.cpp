@@ -57,11 +57,11 @@ void TEvolvent::SetBounds(const double* _A, const double* _B)
 }
 
 // ----------------------------------------------------------------------------
-void TEvolvent::CalculateNumbr(Extended *s, int *u, int *v, int *l)
+void TEvolvent::CalculateNumbr(double *s, int *u, int *v, int *l)
 // calculate s(u)=is,l(u)=l,v(u)=iv by u=iu
 {
   int i, k1, k2, l1;
-  Extended is, iff;
+  double is, iff;
 
   iff = nexpExtended;
   is = extNull;
@@ -101,12 +101,12 @@ void TEvolvent::CalculateNumbr(Extended *s, int *u, int *v, int *l)
 }
 
 // ----------------------------------------------------------------------------
-void TEvolvent::CalculateNode(Extended is, int n, int *u, int *v, int *l)
+void TEvolvent::CalculateNode(double is, int n, int *u, int *v, int *l)
 // вычисление вспомогательного центра u(s) и соответствующих ему v(s) и l(s)
 // calculate u=u[s], v=v[s], l=l[s] by is=s
 {
   int n1, i, j, k1, k2, iq;
-  Extended iff;
+  double iff;
   double nexp;
 
   iq = 1;
@@ -189,23 +189,24 @@ void TEvolvent::transform_D_to_P()
 }
 
 // ----------------------------------------------------------------------------
-double* TEvolvent::GetYOnX(const Extended& _x)
+double* TEvolvent::GetYOnX(const double& _x)
 {
   if (N == 1)
   {
-    y[0] = _x.toDouble() - 0.5;
+//    y[0] = _x.toDouble() - 0.5;
+    y[0] = _x - 0.5;
     return y;
   }
 
   int iu[MaxDim];
   int iv[MaxDim];
   int l;
-  Extended d;
+  double d;
   int mn;
   double r;
   int iw[MaxDim];
   int it, i, j;
-  Extended is;
+  double is;
 
   d = _x;
   r = 0.5;
@@ -227,7 +228,8 @@ double* TEvolvent::GetYOnX(const Extended& _x)
     {
       //Код из старой версии - уточнить работоспособность при N > 32
       d *= nexpExtended;
-      is =(int)d.toDouble();
+//      is =(int)d.toDouble();
+      is =(int)d;
       d  -= is;
     }
     CalculateNode(is, N, iu, iv, &l);
@@ -254,10 +256,10 @@ double* TEvolvent::GetYOnX(const Extended& _x)
 }
 
 //-----------------------------------------------------------------------------
-Extended TEvolvent::GetXOnY()
+double TEvolvent::GetXOnY()
 {
   int u[MaxDim], v[MaxDim];
-  Extended x, r1;
+  double x, r1;
   if (N == 1)
   {
     x = y[0] + 0.5;
@@ -267,7 +269,7 @@ Extended TEvolvent::GetXOnY()
   double  r;
   int w[MaxDim];
   int i, j, it, l;
-  Extended is;
+  double is;
 
   for (i = 0; i < N; i++)
     w[i] = 1;
@@ -306,7 +308,7 @@ Extended TEvolvent::GetXOnY()
 }
 
 //----------------------------------------------------------------------------
-void TEvolvent::GetImage(const Extended& x, double* _y)
+void TEvolvent::GetImage(const double& x, double* _y)
 {
   // x ---> y
   GetYOnX(x); // it saves return value to y, so no need to call operator= again
@@ -333,12 +335,12 @@ TShiftedEvolvent::~TShiftedEvolvent()
 }
 
 // ------------------------------------------------------------------------------------------------
-void TShiftedEvolvent::GetImage(const Extended& x, int EvolventNum, double* _y)
+void TShiftedEvolvent::GetImage(const double& x, int EvolventNum, double* _y)
 {
 }
 
 // ------------------------------------------------------------------------------------------------
-void TShiftedEvolvent::GetPreimages(double* _y, Extended *x)
+void TShiftedEvolvent::GetPreimages(double* _y, double *x)
 {
 }
 
@@ -410,7 +412,7 @@ void TRotatedEvolvent::GetAllPlanes()
 }
 
 // ------------------------------------------------------------------------------------------------
-void TRotatedEvolvent::GetImage(const Extended& x, int EvolventNum, double* _y)
+void TRotatedEvolvent::GetImage(const double& x, int EvolventNum, double* _y)
 {
   if (EvolventNum == 0 || L == 1)
   {
@@ -450,7 +452,7 @@ void TRotatedEvolvent::GetImage(const Extended& x, int EvolventNum, double* _y)
 }
 
 // ------------------------------------------------------------------------------------------------
-void TRotatedEvolvent::GetPreimages(double* _y, Extended *x)
+void TRotatedEvolvent::GetPreimages(double* _y, double *x)
 {
   memcpy(y, _y, N * sizeof(double));
   transform_D_to_P();

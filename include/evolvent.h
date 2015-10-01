@@ -17,7 +17,7 @@
 #define __EVOLVENT_H__
 
 #include "common.h"
-#include "extended.h"
+//#include "extended.h"
 
 // ------------------------------------------------------------------------------------------------
 class TEvolvent
@@ -30,22 +30,22 @@ protected:
 
   double*  y;             // y point from hypercube [-1/2, 1/2]^N
 
-  const Extended extNull; // = 0.0; //Extended(0.0);
-  const Extended extOne;  // = 1.0; //Extended(1.0);
-  const Extended extHalf; // = 0.5; //Extended(0.5);
-  Extended nexpExtended;
+  const double extNull; // = 0.0; //Extended(0.0);
+  const double extOne;  // = 1.0; //Extended(1.0);
+  const double extHalf; // = 0.5; //Extended(0.5);
+  double nexpExtended;
 
-  void CalculateNumbr(Extended *s, int *u, int *v, int *l);
-  void CalculateNode(Extended is, int n, int *u, int *v, int *l);
+  void CalculateNumbr(double *s, int *u, int *v, int *l);
+  void CalculateNode(double is, int n, int *u, int *v, int *l);
   void transform_P_to_D(); // transformation from hypercube P to hyperinterval D
   void transform_D_to_P(); // transformation from hyperinterval D to hypercube P
-  double* GetYOnX(const Extended& _x);
-  Extended GetXOnY();
+  double* GetYOnX(const double& _x);
+  double GetXOnY();
 public:
   TEvolvent(int _N = 2, int _m = 10);
   virtual ~TEvolvent();
   void SetBounds(const double* _A, const double* _B);
-  void GetImage(const Extended& x, double* _y);
+  void GetImage(const double& x, double* _y);
 };
 
 class TShiftedEvolvent: public TEvolvent
@@ -56,8 +56,8 @@ protected:
 public:
   TShiftedEvolvent(int _N = 2, int _m = 10, int _L = 0);
   virtual ~TShiftedEvolvent();
-  void GetImage(const Extended& x, int EvolventNum, double* _y);
-  void GetPreimages(double* _y, Extended *x);
+  void GetImage(const double& x, int EvolventNum, double* _y);
+  void GetPreimages(double* _y, double *x);
 };
 
 class TRotatedEvolvent: public TEvolvent
@@ -72,8 +72,8 @@ protected:
 public:
   TRotatedEvolvent(int _N = 2, int _m = 10, int _L = 0);
   virtual ~TRotatedEvolvent();
-  void GetImage(const Extended& x, int EvolventNum, double* _y);
-  void GetPreimages(double* _y, Extended *x);
+  void GetImage(const double& x, int EvolventNum, double* _y);
+  void GetPreimages(double* _y, double *x);
 };
 
 #endif
