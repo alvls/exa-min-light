@@ -20,7 +20,7 @@
 #include "task.h"
 #include "data.h"
 #include "evolvent.h"
-#include "parameters.h"
+//#include "parameters.h"
 
 // ------------------------------------------------------------------------------------------------
 class TMethod
@@ -36,7 +36,7 @@ protected:
   int               L;                // 1 <= число разверток (<= m - для сдвиговой)
   int               CurL;             // номер текущей развертки - нумерация с 0
   int               NumPoints;        // число точек, порождаемых методом на 1 итерации
-  EMapType          MapType;          // тип развертки (сдвиговая, вращаемая)
+//  EMapType          MapType;          // тип развертки (сдвиговая, вращаемая)
   bool              recalc;           // истина, если нужен пересчет характеристик
 
   TTask             *pTask;
@@ -48,7 +48,7 @@ protected:
   TTrial            *pCurTrials;
   TTrial            BestTrial;
 
-  TParameters parameters;             // параметры метода
+//  TParameters parameters;             // параметры метода
 
   TSearchInterval** BestIntervals;    // массив указателей на лучше интервалы (левая!!! точка)
 
@@ -64,7 +64,7 @@ protected:
   virtual void CalculateM(TSearchInterval* p);
 public:
   TMethod(int _MaxNumOfTrials, double _Eps, double _r, double _reserv, int _m, int _L, int _CurL, 
-    EMapType _MapType, TParameters _parameters, TTask *_pTask, TSearchData *_pData);
+    /*EMapType _MapType, /*TParameters _parameters, */TTask *_pTask, TSearchData *_pData);
   virtual ~TMethod();
   /*
   void SetTask(TTask *_pTask);

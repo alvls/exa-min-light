@@ -14,7 +14,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "method.h"
-#include "local_method.h"
+//#include "local_method.h"
 #include "exception.h"
 #include "common.h"
 #include <math.h>
@@ -25,8 +25,8 @@ using namespace std;
 //TMethod::TMethod(int _MaxNumOfTrials, double _Eps, double _r, int _m, int _L, EMapType _MapType,
 //    TTask *_pTask, TSearchData *_pData, TOptimEstimation *_pEstimation)
 TMethod::TMethod(int _MaxNumOfTrials, double _Eps, double _r, double _reserv, int _m, int _L, 
-                 int _CurL, EMapType _MapType, TParameters _parameters, TTask *_pTask, TSearchData *_pData):
-parameters(_parameters)
+                 int _CurL, /*EMapType _MapType, /*TParameters _parameters, */TTask *_pTask, TSearchData *_pData)//:
+//parameters(_parameters)
 {
   MaxNumOfTrials = _MaxNumOfTrials;
   Epsilon = _Eps;
@@ -36,8 +36,8 @@ parameters(_parameters)
   CurL = _CurL;
   reserv = _reserv; // eps-резервирование
   alfa = 15; // пока локальная адаптация - фиксированная
-  NumPoints = _parameters.NumPoints;;
-  MapType = _MapType;
+  //NumPoints = _parameters.NumPoints;;
+  //MapType = _MapType;
   pTask = _pTask;
   pData = _pData;
   IterationCount = 0;
@@ -58,20 +58,20 @@ parameters(_parameters)
 // ----------------------------------------------------------------------------
 void TMethod::InitAutoPrecision()
 {
-  // if user has not set the precision by the command line,
-  // then set it to 1 / (2^((m + 1) * N) - 1)
-  if (Extended::GetPrecision() == 0.01)
-  {
-    if (m * pTask->GetFreeN() <= 50)
-	//Раскомментировать для множественных разверток
-    //    if ((m + 1) * pTask->GetFreeN() < 50)
-    {
-      Extended::SetTypeID(etDouble);
-    }
-	//Раскомментировать для множественных разверток
-    //    Extended::SetPrecision(1/(::pow(2., (m + 1) * pTask->GetFreeN()) - 1));
-    Extended::SetPrecision(1/(::pow(2., m * pTask->GetFreeN()) ));
-  }
+ // // if user has not set the precision by the command line,
+ // // then set it to 1 / (2^((m + 1) * N) - 1)
+ // if (Extended::GetPrecision() == 0.01)
+ // {
+ //   if (m * pTask->GetFreeN() <= 50)
+	////Раскомментировать для множественных разверток
+ //   //    if ((m + 1) * pTask->GetFreeN() < 50)
+ //   {
+ //     Extended::SetTypeID(etDouble);
+ //   }
+	////Раскомментировать для множественных разверток
+ //   //    Extended::SetPrecision(1/(::pow(2., (m + 1) * pTask->GetFreeN()) - 1));
+ //   Extended::SetPrecision(1/(::pow(2., m * pTask->GetFreeN()) ));
+ // }
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -470,8 +470,8 @@ void TMethod::RenewSearchData()
     NewInterval.izr = BestIntervals[j]->izr;
     NewInterval.zr = BestIntervals[j]->zr;
     // Гельдеровская длина интервала
-    NewInterval.delta = root(NewInterval.xr - NewInterval.xl, pTask->GetFreeN());
-    //    NewInterval.delta = pow(NewInterval.dx,1.0/pTask->GetFreeN());
+    //NewInterval.delta = root(NewInterval.xr - NewInterval.xl, pTask->GetFreeN());
+        NewInterval.delta = pow(NewInterval.xr - NewInterval.xl, 1.0 / pTask->GetFreeN());
 
     // Корректируем существующий интервал
     BestIntervals[j]->xr = NewInterval.xl;
@@ -485,8 +485,8 @@ void TMethod::RenewSearchData()
       AchievedAccuracy = BestIntervals[j]->delta;
     }
     // После чего вычисляем новую гельдеровскую длину лучшего интервала
-    BestIntervals[j]->delta = root(BestIntervals[j]->xr - BestIntervals[j]->xl, pTask->GetFreeN());
-    //    BestIntervals[j]->delta = pow(BestIntervals[j]->dx,1.0/pTask->GetFreeN());
+    //BestIntervals[j]->delta = root(BestIntervals[j]->xr - BestIntervals[j]->xl, pTask->GetFreeN());
+    BestIntervals[j]->delta = pow(BestIntervals[j]->xr - BestIntervals[j]->xl,1.0 / pTask->GetFreeN());
 
     // Интервал сформирован - можно добавлять
     // Вставка завершается корректно, или же выбрасывает исключение
@@ -604,12 +604,12 @@ double TMethod::GetMu()
 // ------------------------------------------------------------------------------------------------
 void TMethod::LocalSearch()
 {
-	if (parameters.doLocalVerification &&
-		GetOptimEstimation().index == pTask->GetNumOfFunc() - 1)
-	{
-		TLocalMethod localMethod(parameters, pTask, GetOptimEstimation());
-		BestTrial = localMethod.StartOptimization();
-	}
+	//if (parameters.doLocalVerification &&
+	//	GetOptimEstimation().index == pTask->GetNumOfFunc() - 1)
+	//{
+	//	TLocalMethod localMethod(parameters, pTask, GetOptimEstimation());
+	//	BestTrial = localMethod.StartOptimization();
+	//}
 }
 
 // ------------------------------------------------------------------------------------------------
