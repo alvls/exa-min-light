@@ -1,4 +1,4 @@
-/////////////////////////////////////////////////////////////////////////////
+п»ї/////////////////////////////////////////////////////////////////////////////
 //                                                                         //
 //             LOBACHEVSKY STATE UNIVERSITY OF NIZHNY NOVGOROD             //
 //                                                                         //
@@ -26,41 +26,41 @@
 class TMethod
 {
 protected:
-  int               MaxNumOfTrials;   // максимальное число итераций (испытаний)
-  int               IterationCount;   // число выполненных итераций
-  double            Epsilon;              // точность решения задачи
-  double            AchievedAccuracy; // достигнутая точность
-  double            r;                // надежность метода (> 1)
-  int               m;                // плотность построения развертки (точность 1/2^m по к-те)
-  double            reserv;           // параметр eps-резервирования, 0<=reserv<=0.1
-  int               L;                // 1 <= число разверток (<= m - для сдвиговой)
-  int               CurL;             // номер текущей развертки - нумерация с 0
-  int               NumPoints;        // число точек, порождаемых методом на 1 итерации
-//  EMapType          MapType;          // тип развертки (сдвиговая, вращаемая)
-  bool              recalc;           // истина, если нужен пересчет характеристик
+  int               MaxNumOfTrials;   // РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ С‡РёСЃР»Рѕ РёС‚РµСЂР°С†РёР№ (РёСЃРїС‹С‚Р°РЅРёР№)
+  int               IterationCount;   // С‡РёСЃР»Рѕ РІС‹РїРѕР»РЅРµРЅРЅС‹С… РёС‚РµСЂР°С†РёР№
+  double            Epsilon;              // С‚РѕС‡РЅРѕСЃС‚СЊ СЂРµС€РµРЅРёСЏ Р·Р°РґР°С‡Рё
+  double            AchievedAccuracy; // РґРѕСЃС‚РёРіРЅСѓС‚Р°СЏ С‚РѕС‡РЅРѕСЃС‚СЊ
+  double            r;                // РЅР°РґРµР¶РЅРѕСЃС‚СЊ РјРµС‚РѕРґР° (> 1)
+  int               m;                // РїР»РѕС‚РЅРѕСЃС‚СЊ РїРѕСЃС‚СЂРѕРµРЅРёСЏ СЂР°Р·РІРµСЂС‚РєРё (С‚РѕС‡РЅРѕСЃС‚СЊ 1/2^m РїРѕ Рє-С‚Рµ)
+  double            reserv;           // РїР°СЂР°РјРµС‚СЂ eps-СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРёСЏ, 0<=reserv<=0.1
+  int               L;                // 1 <= С‡РёСЃР»Рѕ СЂР°Р·РІРµСЂС‚РѕРє (<= m - РґР»СЏ СЃРґРІРёРіРѕРІРѕР№)
+  int               CurL;             // РЅРѕРјРµСЂ С‚РµРєСѓС‰РµР№ СЂР°Р·РІРµСЂС‚РєРё - РЅСѓРјРµСЂР°С†РёСЏ СЃ 0
+  int               NumPoints;        // С‡РёСЃР»Рѕ С‚РѕС‡РµРє, РїРѕСЂРѕР¶РґР°РµРјС‹С… РјРµС‚РѕРґРѕРј РЅР° 1 РёС‚РµСЂР°С†РёРё
+//  EMapType          MapType;          // С‚РёРї СЂР°Р·РІРµСЂС‚РєРё (СЃРґРІРёРіРѕРІР°СЏ, РІСЂР°С‰Р°РµРјР°СЏ)
+  bool              recalc;           // РёСЃС‚РёРЅР°, РµСЃР»Рё РЅСѓР¶РµРЅ РїРµСЂРµСЃС‡РµС‚ С…Р°СЂР°РєС‚РµСЂРёСЃС‚РёРє
 
   TTask             *pTask;
   TSearchData       *pData;
-  TEvolvent         *Evolvent;        // развертка
+  TEvolvent         *Evolvent;        // СЂР°Р·РІРµСЂС‚РєР°
 
   tIterationHandler OnIteration;
 
   TTrial            *pCurTrials;
   TTrial            BestTrial;
 
-//  TParameters parameters;             // параметры метода
+//  TParameters parameters;             // РїР°СЂР°РјРµС‚СЂС‹ РјРµС‚РѕРґР°
 
-  TSearchInterval** BestIntervals;    // массив указателей на лучше интервалы (левая!!! точка)
+  TSearchInterval** BestIntervals;    // РјР°СЃСЃРёРІ СѓРєР°Р·Р°С‚РµР»РµР№ РЅР° Р»СѓС‡С€Рµ РёРЅС‚РµСЂРІР°Р»С‹ (Р»РµРІР°СЏ!!! С‚РѕС‡РєР°)
 
-  int alfa;                           // Коэффициент локальной адаптации, от 1(глоб.) до 20(лок.) поиск
+  int alfa;                           // РљРѕСЌС„С„РёС†РёРµРЅС‚ Р»РѕРєР°Р»СЊРЅРѕР№ Р°РґР°РїС‚Р°С†РёРё, РѕС‚ 1(РіР»РѕР±.) РґРѕ 20(Р»РѕРє.) РїРѕРёСЃРє
 
-  //Инициализация чисел с расширенной точностью
+  //РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ С‡РёСЃРµР» СЃ СЂР°СЃС€РёСЂРµРЅРЅРѕР№ С‚РѕС‡РЅРѕСЃС‚СЊСЋ
   virtual void InitAutoPrecision();
-  //Вычисление "глобальной" характеристики
+  //Р’С‹С‡РёСЃР»РµРЅРёРµ "РіР»РѕР±Р°Р»СЊРЅРѕР№" С…Р°СЂР°РєС‚РµСЂРёСЃС‚РёРєРё
   virtual double CalculateGlobalR(TSearchInterval* i);
-  //Вычисление "локальной" характеристики - должна быть вычислена глобальная!!!
+  //Р’С‹С‡РёСЃР»РµРЅРёРµ "Р»РѕРєР°Р»СЊРЅРѕР№" С…Р°СЂР°РєС‚РµСЂРёСЃС‚РёРєРё - РґРѕР»Р¶РЅР° Р±С‹С‚СЊ РІС‹С‡РёСЃР»РµРЅР° РіР»РѕР±Р°Р»СЊРЅР°СЏ!!!
   virtual double CalculateLocalR(TSearchInterval *p);
-  //Вычисление оценки константы Липшица
+  //Р’С‹С‡РёСЃР»РµРЅРёРµ РѕС†РµРЅРєРё РєРѕРЅСЃС‚Р°РЅС‚С‹ Р›РёРїС€РёС†Р°
   virtual void CalculateM(TSearchInterval* p);
 public:
   TMethod(int _MaxNumOfTrials, double _Eps, double _r, double _reserv, int _m, int _L, int _CurL, 
@@ -82,24 +82,24 @@ public:
   //  void ReceiveCalcPoints();
   void RenewSearchData();
   void EstimateOptimum();
-  void IterationHandler(TProcess *pProcess); // call-back функция для обработки результатов итерации метода
+  void IterationHandler(TProcess *pProcess); // call-back С„СѓРЅРєС†РёСЏ РґР»СЏ РѕР±СЂР°Р±РѕС‚РєРё СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ РёС‚РµСЂР°С†РёРё РјРµС‚РѕРґР°
   void FinalizeIteration();
   int GetIterationCount(){return IterationCount;}
 
   TTrial GetOptimEstimation();
   TTrial* GetCurTrials();
   void SetBounds();
-  //Сбор статистики
+  //РЎР±РѕСЂ СЃС‚Р°С‚РёСЃС‚РёРєРё
   int GetNumberOfTrials();
   double GetMu();
-  //Локальное уточнение из текущей лучшей точки
+  //Р›РѕРєР°Р»СЊРЅРѕРµ СѓС‚РѕС‡РЅРµРЅРёРµ РёР· С‚РµРєСѓС‰РµР№ Р»СѓС‡С€РµР№ С‚РѕС‡РєРё
   void LocalSearch();
 
   void SetNumPoints(int _NumPoints);
   int GetNumPoints();
   TSearchInterval **GetBestIntervals();
 
-  //отладка
+  //РѕС‚Р»Р°РґРєР°
   int pn;
 };
 
