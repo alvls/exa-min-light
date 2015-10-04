@@ -1,6 +1,59 @@
-#include "evolvent.h"
+﻿#include "evolvent.h"
 
 #include <gtest.h>
+
+class TEvolventTest : public ::testing::Test 
+{
+ protected:
+    TEvolvent* evolvent;
+    TEvolventTest() : evolvent() {}
+    void SetValue(int N, int m) 
+    {
+        evolvent = new TEvolvent(N, m);        
+    }
+};
+
+
+/*Проверка входных параметров в конструкторе TEvolvent(int _N, int _m)*/
+TEST_F(TEvolventTest, throws_when_get_wrong_value_N)
+{
+    ASSERT_ANY_THROW(SetValue(-1, 3));
+}
+
+TEST_F(TEvolventTest, throws_when_get_wrong_value_m)
+{
+    ASSERT_ANY_THROW(SetValue(2, MaxM + 1));
+}
+
+TEST_F(TEvolventTest, throws_when_get_wrong_values_N_m)
+{
+    ASSERT_ANY_THROW(SetValue(MaxDim + 1, 1));
+}
+
+TEST_F(TEvolventTest, throws_when_get_correct_values_N_m)
+{
+    ASSERT_NO_THROW(SetValue(MaxDim - 1, MaxM - 1));
+}
+
+/*???Проверка SetBounds(const double* _A, const double* _B)*/
+
+
+
+/*Проверка GetImage(const double& x, double* _y)*/
+TEST_F(TEvolventTest, can_get_correct_Y_on_X)
+{    
+    const int N = 2, m = 2;
+    const double A[] = {-0.5, -0.5}, B[] = {0.5, 0.5};
+    const double true_value[N] = {-0.125, -0.375};
+    double x = 0.1;
+    double* y = new double[N];
+    SetValue(N, m);
+    evolvent->SetBounds(A, B);
+    evolvent->GetImage(x, y);
+    for(int i = 0; i < N; i++)
+        EXPECT_EQ(true_value[i], y[i]);
+    delete []y;
+}
 
 //TEST(TSet, can_get_max_power_set)
 //{
