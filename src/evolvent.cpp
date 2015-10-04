@@ -1,4 +1,4 @@
-/////////////////////////////////////////////////////////////////////////////
+п»ї/////////////////////////////////////////////////////////////////////////////
 //                                                                         //
 //             LOBACHEVSKY STATE UNIVERSITY OF NIZHNY NOVGOROD             //
 //                                                                         //
@@ -102,7 +102,7 @@ void TEvolvent::CalculateNumbr(double *s, int *u, int *v, int *l)
 
 // ----------------------------------------------------------------------------
 void TEvolvent::CalculateNode(double is, int n, int *u, int *v, int *l)
-// вычисление вспомогательного центра u(s) и соответствующих ему v(s) и l(s)
+// РІС‹С‡РёСЃР»РµРЅРёРµ РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅРѕРіРѕ С†РµРЅС‚СЂР° u(s) Рё СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёС… РµРјСѓ v(s) Рё l(s)
 // calculate u=u[s], v=v[s], l=l[s] by is=s
 {
   int n1, i, j, k1, k2, iq;
@@ -226,7 +226,7 @@ double* TEvolvent::GetYOnX(const double& _x)
     }
     else
     {
-      //Код из старой версии - уточнить работоспособность при N > 32
+      //РљРѕРґ РёР· СЃС‚Р°СЂРѕР№ РІРµСЂСЃРёРё - СѓС‚РѕС‡РЅРёС‚СЊ СЂР°Р±РѕС‚РѕСЃРїРѕСЃРѕР±РЅРѕСЃС‚СЊ РїСЂРё N > 32
       d *= nexpExtended;
 //      is =(int)d.toDouble();
       is =(int)d;
@@ -368,8 +368,8 @@ TRotatedEvolvent::~TRotatedEvolvent()
 // ------------------------------------------------------------------------------------------------
 void TRotatedEvolvent::GetAllPlanes()
 {
-  const int k = 2; // Подмножества из двух элементов
-  int plane[k];    // Два номера под элементы
+  const int k = 2; // РџРѕРґРјРЅРѕР¶РµСЃС‚РІР° РёР· РґРІСѓС… СЌР»РµРјРµРЅС‚РѕРІ
+  int plane[k];    // Р”РІР° РЅРѕРјРµСЂР° РїРѕРґ СЌР»РµРјРµРЅС‚С‹
 
   for (int i = 0; i < k; i++)
     plane[i] = i;
@@ -383,7 +383,7 @@ void TRotatedEvolvent::GetAllPlanes()
     return;
   }
   int p = k - 1;
-  int counter = 0; //счетчик числа перестановок
+  int counter = 0; //СЃС‡РµС‚С‡РёРє С‡РёСЃР»Р° РїРµСЂРµСЃС‚Р°РЅРѕРІРѕРє
   while (p >= 0)
   {
     for (int i = 0; i < k; i++)
@@ -420,7 +420,7 @@ void TRotatedEvolvent::GetImage(const double& x, int EvolventNum, double* _y)
     return;
   }
 
-  int PlaneIndex = EvolventNum - 1; // теперь PlaneIndex - номер перестановки
+  int PlaneIndex = EvolventNum - 1; // С‚РµРїРµСЂСЊ PlaneIndex - РЅРѕРјРµСЂ РїРµСЂРµСЃС‚Р°РЅРѕРІРєРё
   PlaneIndex = PlaneIndex % PlaneCount;
   
   GetYOnX(x);
@@ -435,7 +435,7 @@ void TRotatedEvolvent::GetImage(const double& x, int EvolventNum, double* _y)
   y[Planes[PlaneIndex][0]] = - tmpCoord;
 
 /*
-  //Меняем знак преобразования, если число разверток больше числа плоскостей
+  //РњРµРЅСЏРµРј Р·РЅР°Рє РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ, РµСЃР»Рё С‡РёСЃР»Рѕ СЂР°Р·РІРµСЂС‚РѕРє Р±РѕР»СЊС€Рµ С‡РёСЃР»Р° РїР»РѕСЃРєРѕСЃС‚РµР№
   if (intx > PlaneCount)
   {
     y[Planes[PlaneIndex][0]] = -y[Planes[PlaneIndex][0]];
@@ -456,7 +456,7 @@ void TRotatedEvolvent::GetPreimages(double* _y, double *x)
 {
   memcpy(y, _y, N * sizeof(double));
   transform_D_to_P();
-  // прообраз для первой развертки
+  // РїСЂРѕРѕР±СЂР°Р· РґР»СЏ РїРµСЂРІРѕР№ СЂР°Р·РІРµСЂС‚РєРё
   x[0] = GetXOnY();
 
   if (L == 1)
@@ -465,20 +465,20 @@ void TRotatedEvolvent::GetPreimages(double* _y, double *x)
   for (int i = 1; i <= L; i++)
   {
     memcpy(y, _y, N * sizeof(double));
-    // обратное преобразование координат
+    // РѕР±СЂР°С‚РЅРѕРµ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РєРѕРѕСЂРґРёРЅР°С‚
     int PlaneIndex = (i - 1) % PlaneCount;
 
     double tmpCoord = y[Planes[PlaneIndex][1]];
     y[Planes[PlaneIndex][1]] = -_y[Planes[PlaneIndex][0]];
     y[Planes[PlaneIndex][0]] = tmpCoord;
 /*
-    if (i > PlaneCount)//Меняем знак преобразования, если число разверток больше числа плоскостей
+    if (i > PlaneCount)//РњРµРЅСЏРµРј Р·РЅР°Рє РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ, РµСЃР»Рё С‡РёСЃР»Рѕ СЂР°Р·РІРµСЂС‚РѕРє Р±РѕР»СЊС€Рµ С‡РёСЃР»Р° РїР»РѕСЃРєРѕСЃС‚РµР№
     {
       y[Planes[PlaneIndex][0]] = -y[Planes[PlaneIndex][0]];
       y[Planes[PlaneIndex][1]] = -y[Planes[PlaneIndex][1]];
     }
 */
-    // прообраз для i - 1 развертки
+    // РїСЂРѕРѕР±СЂР°Р· РґР»СЏ i - 1 СЂР°Р·РІРµСЂС‚РєРё
     x[i] = GetXOnY();
   }
 }

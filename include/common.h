@@ -1,4 +1,4 @@
-/////////////////////////////////////////////////////////////////////////////
+п»ї/////////////////////////////////////////////////////////////////////////////
 //                                                                         //
 //             LOBACHEVSKY STATE UNIVERSITY OF NIZHNY NOVGOROD             //
 //                                                                         //
@@ -29,7 +29,7 @@ const int MaxL = 10;
 
 const double MaxDouble = 1.7e308;
 
-const int DefaultQueueSize = 16777215;//8388607;//1048573;//8388607;//524287; //262143; // должно быть равно 2^k - 1
+const int DefaultQueueSize = 16777215;//8388607;//1048573;//8388607;//524287; //262143; // РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ СЂР°РІРЅРѕ 2^k - 1
 const int DefaultSearchDataSize = 100000;
 
 const int TagChildStartSolve = 101;
