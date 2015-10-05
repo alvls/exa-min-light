@@ -310,6 +310,10 @@ double TEvolvent::GetXOnY()
 //----------------------------------------------------------------------------
 void TEvolvent::GetImage(const double& x, double* _y)
 {
+  if ((x < 0) || (x > 1))
+  {
+    throw EXCEPTION("x is out of range");
+  }
   // x ---> y
   GetYOnX(x); // it saves return value to y, so no need to call operator= again
 

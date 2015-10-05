@@ -1,57 +1,101 @@
 ﻿#include "evolvent.h"
-
+#include <eh.h>
 #include <gtest.h>
 
 class TEvolventTest : public ::testing::Test 
 {
  protected:
     TEvolvent* evolvent;
-    TEvolventTest() : evolvent() {}
-    void SetValue(int N, int m) 
+    TEvolventTest() : evolvent(0) {}
+    void CreateEvolvent(int N, int m) 
     {
-        evolvent = new TEvolvent(N, m);        
+        const double A[] = {-0.5, -0.5}, B[] = {0.5, 0.5};
+        evolvent = new TEvolvent(N, m);  
+        evolvent->SetBounds(A, B);
+    }
+    ~TEvolventTest()
+    {
+        delete evolvent;
     }
 };
 
 
 /*Проверка входных параметров в конструкторе TEvolvent(int _N, int _m)*/
-TEST_F(TEvolventTest, throws_when_get_wrong_value_N)
+TEST(TEvolvent, throws_when_create_with_negative_N)
 {
-    ASSERT_ANY_THROW(SetValue(-1, 3));
+    ASSERT_ANY_THROW(TEvolvent ev(-1, 10));
 }
 
-TEST_F(TEvolventTest, throws_when_get_wrong_value_m)
+TEST(TEvolvent, throws_when_create_with_too_large_N)
 {
-    ASSERT_ANY_THROW(SetValue(2, MaxM + 1));
+    ASSERT_ANY_THROW(TEvolvent ev(MaxDim + 1, 10));
 }
 
-TEST_F(TEvolventTest, throws_when_get_wrong_values_N_m)
+TEST(TEvolvent, throws_when_create_with_too_low_m)
 {
-    ASSERT_ANY_THROW(SetValue(MaxDim + 1, 1));
+    ASSERT_ANY_THROW(TEvolvent ev(2, 1));
 }
 
-TEST_F(TEvolventTest, throws_when_get_correct_values_N_m)
+TEST(TEvolvent, throws_when_create_with_too_large_m)
 {
-    ASSERT_NO_THROW(SetValue(MaxDim - 1, MaxM - 1));
+    ASSERT_ANY_THROW(TEvolvent ev(2, MaxM + 1));
 }
 
-/*???Проверка SetBounds(const double* _A, const double* _B)*/
+TEST(TEvolvent, can_create_with_correct_values)
+{
+    ASSERT_NO_THROW(TEvolvent ev(MaxDim - 1, MaxM - 1));
+}
 
-
+/*Проверка ~TEvolvent()*/
+//TEST_F(TEvolventTest, can_correctly_remove_memory)
+//{
+//    const int N = 2, m = 2;
+//    const double true_value[N] = {-0.125, -0.375};
+//    double x = 0.1;
+//    double* y = new double[N];
+//    CreateEvolvent(N, m);
+//    delete evolvent;
+//    try
+//    {
+//    ASSERT_ANY_THROW(evolvent->GetImage(x, y));
+//    }
+//    catch(...)
+//    {
+//    }
+//    CreateEvolvent(N, m);
+//}
 
 /*Проверка GetImage(const double& x, double* _y)*/
-TEST_F(TEvolventTest, can_get_correct_Y_on_X)
+TEST_F(TEvolventTest, can_get_Y_on_correct_X)
 {    
     const int N = 2, m = 2;
-    const double A[] = {-0.5, -0.5}, B[] = {0.5, 0.5};
     const double true_value[N] = {-0.125, -0.375};
     double x = 0.1;
     double* y = new double[N];
-    SetValue(N, m);
-    evolvent->SetBounds(A, B);
+    CreateEvolvent(N, m);
     evolvent->GetImage(x, y);
     for(int i = 0; i < N; i++)
         EXPECT_EQ(true_value[i], y[i]);
+    delete []y;
+}
+
+TEST_F(TEvolventTest, throws_when_get_image_with_negative_x)
+{    
+    const int N = 2, m = 2;
+    double x = -1;
+    double* y = new double[N];
+    CreateEvolvent(N, m);
+    ASSERT_ANY_THROW(evolvent->GetImage(x, y));
+    delete []y;
+}
+
+TEST_F(TEvolventTest, throws_when_get_image_with_too_large_x)
+{    
+    const int N = 2, m = 2;
+    double x = 2;
+    double* y = new double[N];
+    CreateEvolvent(N, m);
+    ASSERT_ANY_THROW(evolvent->GetImage(x, y));
     delete []y;
 }
 
