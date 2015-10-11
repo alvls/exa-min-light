@@ -35,6 +35,7 @@ TMethod::TMethod(int _MaxNumOfTrials, double _Eps, double _r, double _reserv, in
   CurL = _CurL;
   reserv = _reserv; // eps-резервирование
   alfa = 15; // пока локальная адаптация - фиксированная
+  NumPoints = 1;
   //NumPoints = _parameters.NumPoints;;
   //MapType = _MapType;
   pTask = _pTask;
