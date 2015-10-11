@@ -27,12 +27,38 @@ TMethod::TMethod(int _MaxNumOfTrials, double _Eps, double _r, double _reserv, in
                  int _CurL, /*EMapType _MapType, /*TParameters _parameters, */TTask *_pTask, TSearchData *_pData)//:
 //parameters(_parameters)
 {
+  if (_MaxNumOfTrials < 1)
+  {
+    throw EXCEPTION("MaxNumOfTrials is out of range");
+  }
   MaxNumOfTrials = _MaxNumOfTrials;
+
+  if ((_Eps <= 0.0) || (_Eps > 0.01))
+  {
+    throw EXCEPTION("Epsilon is out of range");
+  }
   Epsilon = _Eps;
+
+  if (_r <= 2.0)
+  {
+    throw EXCEPTION("r is out of range");
+  }
   r = _r; 
+
   m = _m;
+
+  if (_L < 1)
+  {
+    throw EXCEPTION("L is out of range");
+  }
   L = _L;
+
   CurL = _CurL;
+
+  if ((_reserv < 0.0) || (_reserv > 0.01))
+  {
+    throw EXCEPTION("Epsilon is out of range");
+  }
   reserv = _reserv; // eps-резервирование
   alfa = 15; // пока локальная адаптация - фиксированная
   NumPoints = 1;
