@@ -1,17 +1,16 @@
-﻿/////////////////////////////////////////////////////////////////////////////
-//                                                                         //
-//             LOBACHEVSKY STATE UNIVERSITY OF NIZHNY NOVGOROD             //
-//                                                                         //
-//                       Copyright (c) 2015 by UNN.                        //
-//                          All Rights Reserved.                           //
-//                                                                         //
-//  File:      method.cpp                                                  //
-//                                                                         //
-//  Purpose:   Source file for method class                                //
-//                                                                         //
-//  Author(s): Sysoyev A., Barkalov K.                                     //
-//                                                                         //
-/////////////////////////////////////////////////////////////////////////////
+﻿/*
+* Copyright (C) 2015 University of Nizhni Novgorod
+* This file is part of the Globalizer Light library, v 1.0
+* 
+* method.cpp - source file for method class
+* 
+* This file may be used under the terms of the GNU Lesser General Public 
+* License version 2.1 as published by the Free Software Foundation 
+* and appearing in the file LICENSE.LGPL included in the packaging of this 
+* file. Please review the following information to ensure the GNU Lesser 
+* General Public License version 2.1 requirements will be met: 
+* http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+*/
 
 #include "method.h"
 //#include "local_method.h"

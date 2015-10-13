@@ -1,17 +1,16 @@
-/////////////////////////////////////////////////////////////////////////////
-//                                                                         //
-//             LOBACHEVSKY STATE UNIVERSITY OF NIZHNY NOVGOROD             //
-//                                                                         //
-//                       Copyright (c) 2015 by UNN.                        //
-//                          All Rights Reserved.                           //
-//                                                                         //
-//  File:      queue.h                                                     //
-//                                                                         //
-//  Purpose:   Header file for priority queue class                        //
-//                                                                         //
-//  Author(s): Sysoyev A.                                                  //
-//                                                                         //
-/////////////////////////////////////////////////////////////////////////////
+/*
+* Copyright (C) 2015 University of Nizhni Novgorod
+* This file is part of the Globalizer Light library, v 1.0
+* 
+* queue.h - header file for priority queue class
+* 
+* This file may be used under the terms of the GNU Lesser General Public 
+* License version 2.1 as published by the Free Software Foundation 
+* and appearing in the file LICENSE.LGPL included in the packaging of this 
+* file. Please review the following information to ensure the GNU Lesser 
+* General Public License version 2.1 requirements will be met: 
+* http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+*/
 
 #ifndef __QUEUE_H__
 #define __QUEUE_H__

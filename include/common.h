@@ -2,7 +2,7 @@
 * Copyright (C) 2015 University of Nizhni Novgorod
 * This file is part of the Globalizer Light library, v 1.0
 * 
-* common.h - common defenitions
+* common.h - common definitions
 * 
 * This file may be used under the terms of the GNU Lesser General Public 
 * License version 2.1 as published by the Free Software Foundation 
