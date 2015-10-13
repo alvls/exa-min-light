@@ -132,3 +132,41 @@ TEST_F(TMethodTest, can_create_with_correct_values)
 {
   ASSERT_NO_THROW(TMethod method(MaxNumOfTrials, eps, r, reserv, m, L, curl, task, pData));
 }
+
+/*Проверка FirstIteration*/
+TEST_F(TMethodTest, on_FirstIteration_can_reset_IterationCount)
+{
+  CreateMethod();
+  method->FirstIteration();
+  ASSERT_EQ(1, method->GetIterationCount()); 
+}
+
+TEST_F(TMethodTest, on_FirstIterationcan_reset_BestTrial)
+{
+  CreateMethod();
+  method->FirstIteration();
+  ASSERT_EQ(-2, method->GetOptimEstimation().index);
+}
+
+TEST_F(TMethodTest, on_FirstIterationcan_reset_NumberOfTrials)
+{
+  CreateMethod();
+  method->FirstIteration();
+  ASSERT_EQ(0, method->GetNumberOfTrials());
+}
+
+TEST_F(TMethodTest, on_FirstIteration_can_generate_new_points)
+{
+  CreateMethod();
+  method->FirstIteration();
+  int NumPoints = method->GetNumPoints();
+  double h = 1.0 / (NumPoints + 1);
+  for(int i = 0; i < NumPoints; i++)
+    ASSERT_EQ((i + 1) * h, method->GetCurTrials()[i].x);
+}
+
+
+
+
+  
+  
