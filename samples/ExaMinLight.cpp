@@ -20,17 +20,19 @@
 //#include <stdlib.h>
 //#include <string.h>
 
-//#define _USE_MATH_DEFINES
-//#include <math.h>
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 //#ifdef WIN32
 //#include <windows.h>
 //#endif
 
+#include "method.h"
+
 #include "common.h"
 #include "exception.h"
 
-/*
+
 // ------------------------------------------------------------------------------------------------
 double func(const double *y, int N)
 {
@@ -54,14 +56,28 @@ double res;// = (y[0]-0.1)*(y[0]-0.1)+0.1;
 res = func(y, 3);
 
 return res;
-}*/
+}
 
 
 int main(int argc, char* argv[])
 {
-//  double A[MaxDim] = {-1.1, -1.1, -1.1, -1.1, -1.1, -1.1, -1.1, -1.1, -1, -1, -1, -1, -1, -1, -1, -1};
-//  double B[MaxDim] = {1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1.2, 1, 1, 1, 1, 1, 1, 1, 1};
+  double A[MaxDim] = {-1.1, -1.1, -1.1, -1.1, -1.1};
+  double B[MaxDim] = {1.2, 1.2, 1.2, 1.2, 1.2};
 
+  int MaxNumOfTrials = 100000;
+  double eps = 0.0001;
+  double r = 2.3;
+  double reserv = 0.001; 
+  int m = 5;
+  int L = 5;
+  int curl = 0;
+  int N = 3;
+  int NumOfFunc = 1;
+  const tFunction f[MaxNumOfFunc] = {&function};
+  TTask* task = new TTask(N, N, NumOfFunc, A, B, f);
+  TSearchData* pData = new TSearchData(NumOfFunc);
+  bool IsStop = false;
+  TMethod * method;
 //  TProcess *Process;
 
 //#ifdef WIN32
@@ -72,6 +88,30 @@ int main(int argc, char* argv[])
 //#endif
   try
   {
+    TTrial OptimEstimation;
+    int NumberOfTrials;
+    method = new TMethod(MaxNumOfTrials, eps, r, reserv, m, L, curl, task, pData);  
+    method->SetBounds();
+    method->FirstIteration();
+    while (!IsStop)
+    {      
+      method->CalculateIterationPoints();
+      IsStop = method->CheckStopCondition();
+      method->CalculateFunctionals();
+      method->RenewSearchData();
+      method->EstimateOptimum();
+      method->FinalizeIteration();
+    }
+ 
+    OptimEstimation = method->GetOptimEstimation();
+    printf("min = %lf \n",OptimEstimation.FuncValues[OptimEstimation.index]);
+    for(int i=0;i<task->GetN();i++)
+    {
+      printf("x[%d] = %lf \n",i,OptimEstimation.y[i]);
+    }
+    NumberOfTrials = method->GetNumberOfTrials();
+    printf("NumberOfTrials = %d\n",NumberOfTrials);
+
     //if (parameters.TypeProcess == SynchronousProcess)
     //  Process = new TProcess(A, B, NumOfFunc, F, parameters);
     //if (parameters.TypeProcess == SynchronousProcessNew)

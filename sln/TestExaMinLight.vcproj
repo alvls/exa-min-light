@@ -207,6 +207,10 @@
 				RelativePath="..\test\test_main.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\test_method.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
