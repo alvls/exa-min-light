@@ -1,4 +1,4 @@
-#include "method.h"
+ï»¿#include "method.h"
 #include <gtest.h>
 
 #define _USE_MATH_DEFINES
@@ -76,7 +76,7 @@ protected:
 };
 
 
-/*Ïðîâåðêà âõîäíûõ ïàðàìåòðîâ â êîíñòðóêòîðå TMethod*/
+/*ÐŸÑ€Ð¾Ð²ÐµÑ€ÐºÐ° Ð²Ñ…Ð¾Ð´Ð½Ñ‹Ñ… Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ð¾Ð² Ð² ÐºÐ¾Ð½ÑÑ‚Ñ€ÑƒÐºÑ‚Ð¾Ñ€Ðµ TMethod*/
 TEST_F(TMethodTest, throws_when_create_with_not_positive_MaxNumOfTrials)
 {  
   ASSERT_ANY_THROW(TMethod method(0, _EPS, _R, _RESERV, _M, _L, _CURL, task, pData));
@@ -127,7 +127,7 @@ TEST_F(TMethodTest, can_create_with_correct_values)
   ASSERT_NO_THROW(TMethod method(_MAX_NUM_OF_TRAILS, _EPS, _R, _RESERV, _M, _L, _CURL, task, pData));
 }
 
-/*Ïðîâåðêà FirstIteration*/
+/*ÐŸÑ€Ð¾Ð²ÐµÑ€ÐºÐ° FirstIteration*/
 TEST_F(TMethodTest, on_FirstIteration_can_reset_IterationCount)
 {
   CreateMethod();
@@ -162,7 +162,7 @@ TEST_F(TMethodTest, on_FirstIteration_can_generate_new_points)
 }
 
 
-/*Ïðîâåðêà FinalizeIteration*/
+/*ÐŸÑ€Ð¾Ð²ÐµÑ€ÐºÐ° FinalizeIteration*/
 TEST_F(TMethodTest, FinalizeIteration_can_increase_iterationCount_1)
 {
   CreateMethod();
@@ -174,7 +174,7 @@ TEST_F(TMethodTest, FinalizeIteration_can_increase_iterationCount_1)
   ASSERT_EQ( ++count, method->GetIterationCount());
 }
 
-/*Ïðîâåðêà CheckStopCondition*/
+/*ÐŸÑ€Ð¾Ð²ÐµÑ€ÐºÐ° CheckStopCondition*/
 TEST_F(TMethodTest, CheckStopCondition_can_stop_method_when_too_many_inerations)
 {
   int current_MaxNumOfTrials = 2;
@@ -220,4 +220,40 @@ TEST_F(TMethodTest, CheckStopCondition_can_stop_method_when_required_accuracy_is
 }
 
   
-  
+///*ÐŸÑ€Ð¾Ð²ÐµÑ€ÐºÐ° EstimateOptimum*/
+//TEST_F(TMethodTest, EstimateOptimum)
+//{
+//  CreateMethod();
+//  
+//  TTrial BestTrial;
+//  TTrial* pCurTrials;
+//  bool IsStop = false;
+//  int NumPoints = method->GetNumPoints();
+//  int indexBestTrial = 0;
+//  method->FirstIteration();
+//  while (!IsStop)
+//  {      
+//    method->CalculateIterationPoints();
+//    IsStop = method->CheckStopCondition();
+//    method->CalculateFunctionals();
+//    method->RenewSearchData();
+//    method->EstimateOptimum();
+//    method->FinalizeIteration();
+//
+//    pCurTrials = method->GetCurTrials();
+//
+//    for (int i = 1; i < NumPoints; i++)
+//    {
+//      if (pCurTrials[i].index > pCurTrials[indexBestTrial].index || 
+//          pCurTrials[i].index == pCurTrials[indexBestTrial].index && 
+//          pCurTrials[i].FuncValues[pCurTrials[indexBestTrial].index] < pCurTrials[indexBestTrial].FuncValues[pCurTrials[indexBestTrial].index])
+//      {
+//        indexBestTrial = i;
+//      }
+//    }
+//
+//    BestTrial = method->GetOptimEstimation();
+//    ASSERT_EQ(  BestTrial.index, pCurTrials[indexBestTrial].index);
+//    //ASSERT_EQ(  BestTrial.x, pCurTrials[indexBestTrial].x);
+//  }
+//}  
