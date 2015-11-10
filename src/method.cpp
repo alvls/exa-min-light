@@ -655,4 +655,9 @@ TSearchInterval** TMethod::GetBestIntervals()
 {
   return BestIntervals;
 }
+
+double TMethod::GetAchievedAccuracy()
+{
+  return AchievedAccuracy;
+}
 // - end of file ----------------------------------------------------------------------------------

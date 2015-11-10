@@ -97,7 +97,8 @@ public:
   void SetNumPoints(int _NumPoints);
   int GetNumPoints();
   TSearchInterval **GetBestIntervals();
-
+  double GetAchievedAccuracy();
+ 
   //отладка
   int pn;
 };
