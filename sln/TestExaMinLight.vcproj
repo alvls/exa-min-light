@@ -211,6 +211,14 @@
 				RelativePath="..\test\test_method.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\test\test_task.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\test\testFunction.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -251,6 +259,10 @@
 			</File>
 			<File
 				RelativePath="..\include\task.h"
+				>
+			</File>
+			<File
+				RelativePath="..\test\testFunction.h"
 				>
 			</File>
 		</Filter>
