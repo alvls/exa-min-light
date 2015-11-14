@@ -13,10 +13,16 @@
 */
 
 #include "queue.h"
+#include "exception.h"
 
 // ------------------------------------------------------------------------------------------------
 TPriorityQueue::TPriorityQueue(int _MaxSize)
 {
+  int tmpPow2 = _MaxSize + 1;
+  if (tmpPow2&(tmpPow2-1))
+  {
+       throw EXCEPTION("Max size of queue not divisible by power of two");
+  }    
   MaxSize = _MaxSize;
   CurSize = 0;
   pMem = new TQueueElement[MaxSize];
@@ -93,13 +99,21 @@ void TPriorityQueue::PushWithPriority(double key, void *value)
 // ------------------------------------------------------------------------------------------------
 void TPriorityQueue::Pop(double *key, void **value)
 {
-  *key = pMem[0].Key;
-  *value = pMem[0].pValue;
-  pMem[0].Key = pMem[CurSize - 1].Key;
-  pMem[0].pValue = pMem[CurSize - 1].pValue;
-  CurSize--;
-  if (CurSize > 1)
-    ReBuild(0);
+  if(!IsEmpty())
+  {
+      *key = pMem[0].Key;
+      *value = pMem[0].pValue;
+      pMem[0].Key = pMem[CurSize - 1].Key;
+      pMem[0].pValue = pMem[CurSize - 1].pValue;
+      CurSize--;
+      if (CurSize > 1)
+        ReBuild(0);
+  }
+  else
+  {
+      throw EXCEPTION("Not can pop element when queue is empty");
+  }
+
 }
 
 // ------------------------------------------------------------------------------------------------
