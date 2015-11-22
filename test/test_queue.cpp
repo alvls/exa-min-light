@@ -1,14 +1,14 @@
 ﻿#include "queue.h"
 #include <gtest.h>
 
-#define MAXSIZE 1023
+#define SIZE 1023
 class TQueueTest : public ::testing::Test 
 {
 protected:
   TPriorityQueue* queue;
   TQueueTest() :  queue(0) {}
 
-  void CreateQueue(int maxSize = MAXSIZE) 
+  void CreateQueue(int maxSize = SIZE) 
   {
     queue = new TPriorityQueue(maxSize);  
   }
@@ -24,7 +24,27 @@ TEST_F(TQueueTest, throws_when_create_with_max_size_queue_not_divisible_by_power
   ASSERT_ANY_THROW(TPriorityQueue q(10));
 }
 
-TEST_F(TQueueTest, can_create_queue_with_correct_values)
+TEST_F(TQueueTest, can_create_queue_with_DefaultQueueSize)
+{    
+  ASSERT_NO_THROW(TPriorityQueue q(DefaultQueueSize));
+}
+
+TEST_F(TQueueTest, can_create_queue_with_MaxQueueSize)
+{    
+  ASSERT_NO_THROW(TPriorityQueue q(MaxQueueSize));
+}
+
+TEST_F(TQueueTest, can_allocate_memory_for_queue)
+{    
+  ASSERT_NO_THROW(TPriorityQueue q(SIZE));
+}
+
+/*TEST_F(TQueueTest, throws_when_memory_for_queue_not_allocated)
+{    
+  ASSERT_ANY_THROW(TPriorityQueue q(INT_MAX));
+}*/
+
+TEST_F(TQueueTest, can_create_queue_with_correct_value)
 {
   ASSERT_NO_THROW(TPriorityQueue q(1023));
 }

@@ -29,6 +29,7 @@ const int MaxL = 10;
 const double MaxDouble = 1.7e308;
 
 const int DefaultQueueSize = 1048575; // should be 2^k - 1
+const int MaxQueueSize = 134217727;
 const int DefaultSearchDataSize = 100000;
 
 /* ========================================================================= *\

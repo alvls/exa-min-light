@@ -25,7 +25,20 @@ TPriorityQueue::TPriorityQueue(int _MaxSize)
   }    
   MaxSize = _MaxSize;
   CurSize = 0;
-  pMem = new TQueueElement[MaxSize];
+  pMem = 0;
+  try 
+  {
+      pMem = new TQueueElement[MaxSize];
+  }
+  catch(...)
+  {
+    throw EXCEPTION("Memory for queue is not allocated.");
+  }
+
+  if (pMem == 0)
+  {
+    throw EXCEPTION("Memory for queue is not allocated.");
+  }
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -72,7 +85,7 @@ void TPriorityQueue::Push(double key, void *value)
 // ------------------------------------------------------------------------------------------------
 void TPriorityQueue::PushWithPriority(double key, void *value)
 {
-  if (IsEmpty())
+  if (CurSize == 0)
   {
     CurSize++;
     pMem[CurSize - 1].Key = key;
@@ -99,7 +112,7 @@ void TPriorityQueue::PushWithPriority(double key, void *value)
 // ------------------------------------------------------------------------------------------------
 void TPriorityQueue::Pop(double *key, void **value)
 {
-  if(!IsEmpty())
+  if(CurSize != 0)
   {
       *key = pMem[0].Key;
       *value = pMem[0].pValue;
