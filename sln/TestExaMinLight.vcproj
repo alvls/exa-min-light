@@ -200,6 +200,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\test\test_data.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\test\test_evolvent.cpp"
 				>
 			</File>
