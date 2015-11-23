@@ -120,3 +120,97 @@ TEST_F(TSearchDataTest, can_get_interval_by_X)
 
   ASSERT_EQ(interval.R, data->GetIntervalByX(interval.xl)->R);
 }
+
+TEST_F(TSearchDataTest, can_clear_data)
+{  
+  TSearchInterval interval;
+  CreateSearchData();
+  TSearchInterval* pInterval = data->InsertInterval(interval);
+  data->PushToQueue(pInterval);
+
+  data->Clear();
+
+  ASSERT_TRUE(data->IsQueueEmpty() && !data->GetCount());
+}
+
+TEST_F(TSearchDataTest, reset_can_return_pointer_to_first_element_if_data_not_empty)
+{  
+  TSearchInterval interval;
+  CreateSearchData();
+  interval.xl = 1;
+  interval.R = 1;
+  TSearchInterval* interval1 = data->InsertInterval(interval);
+  interval.xl = 2;
+  interval.R = 2;
+  TSearchInterval* interval2 = data->InsertInterval(interval);
+
+  TSearchInterval* firstInterval = data->Reset();
+
+  ASSERT_EQ(interval1, firstInterval);
+}
+
+TEST_F(TSearchDataTest, reset_can_return_NULL_if_data_empty)
+{  
+  TSearchInterval interval;
+  CreateSearchData();
+
+  TSearchInterval* firstInterval = data->Reset();
+
+  ASSERT_EQ(0, firstInterval);
+}
+
+TEST_F(TSearchDataTest, GetNext_can_return_pointer_to_next_element_if_it_is)
+{  
+  TSearchInterval interval;
+  CreateSearchData();
+  interval.xl = 1;
+  interval.R = 1;
+  TSearchInterval* interval1 = data->InsertInterval(interval);
+  interval.xl = 2;
+  interval.R = 2;
+  TSearchInterval* interval2 = data->InsertInterval(interval);
+
+  TSearchInterval* firstInterval = data->Reset();
+  TSearchInterval* secondInterval = data->GetNext();
+
+  ASSERT_EQ(interval2, secondInterval);
+}
+
+TEST_F(TSearchDataTest, GetNext_can_return_NULL_if_current_element_is_end)
+{  
+  TSearchInterval interval;
+  CreateSearchData();
+  interval.xl = 1;
+  interval.R = 1;
+  TSearchInterval* interval1 = data->InsertInterval(interval);
+
+  TSearchInterval* firstInterval = data->Reset();
+  TSearchInterval* secondInterval = data->GetNext();
+
+  ASSERT_EQ(0, secondInterval);
+}
+
+TEST_F(TSearchDataTest, GetNext_can_return_NULL_if_data_is_empty)
+{  
+  TSearchInterval interval;
+  CreateSearchData();
+
+  TSearchInterval* firstInterval = data->Reset();
+  TSearchInterval* secondInterval = data->GetNext();
+
+  ASSERT_EQ(0, secondInterval);
+}
+
+TEST_F(TSearchDataTest, iterator_can_detect_end_of_data)
+{  
+  TSearchInterval interval;
+  CreateSearchData();
+  interval.xl = 1;
+  interval.R = 1;
+  TSearchInterval* interval1 = data->InsertInterval(interval);
+
+  TSearchInterval* firstInterval = data->Reset();
+  TSearchInterval* secondInterval = data->GetNext();
+
+  ASSERT_TRUE(data->IsEnd());
+}
