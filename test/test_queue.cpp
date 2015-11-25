@@ -138,7 +138,7 @@ TEST_F(TQueueTest, can_push_to_full_queue_when_element_with_largest_key)
   queue->Push(6, "f");
 
   queue->Pop(&key, &value);
-  ASSERT_EQ(4, key);
+  ASSERT_EQ(6, key);
 }
 
 TEST_F(TQueueTest, can_push_to_full_queue_when_element_is_greater_then_min_key)
@@ -152,7 +152,7 @@ TEST_F(TQueueTest, can_push_to_full_queue_when_element_is_greater_then_min_key)
   for(int i = 0; i < 2; i++)
     queue->Pop(&key, &value);
 
-  ASSERT_EQ(3, key);
+  ASSERT_EQ(4, key);
 }
 
 TEST_F(TQueueTest, can_delete_element_with_min_key_when_push_to_full_queue_element_with_greater_key)
@@ -211,30 +211,26 @@ TEST_F(TQueueTest, can_push_when_element_is_equal_to_min_key)
   ASSERT_EQ(resValue, (char*)value);
 }
 
-TEST_F(TQueueTest, can_push_to_full_queue_when_element_is_greater_then_min_key)
+TEST_F(TQueueTest, can_push_with_priority_to_full_queue_when_element_is_greater_then_min_key)
 {
   double key;
   void* value;
   char* resValue = "d";
   CreateQueue(3);
-  queue->PushWithPriority(1, "a");
-  queue->PushWithPriority(1, "b");
-  queue->PushWithPriority(3, "c");
+  SetUpFullQueue();
 
-  queue->PushWithPriority(2, "d");
+  queue->PushWithPriority(4, resValue);
 
   queue->Pop(&key, &value);
   queue->Pop(&key, &value);
-  ASSERT_EQ(2, key);
+  ASSERT_EQ(4, key);
   ASSERT_EQ(resValue, (char*)value);
 }
 
 TEST_F(TQueueTest, can_clear_queue)
 {  
   CreateQueue(3);
-  queue->Push(1, "a");
-  queue->Push(1, "b");
-  queue->Push(3, "c");
+  SetUpFullQueue();
 
   queue->Clear();
 
