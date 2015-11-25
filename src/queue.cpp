@@ -21,14 +21,14 @@ TPriorityQueue::TPriorityQueue(int _MaxSize)
   int tmpPow2 = _MaxSize + 1;
   if (tmpPow2&(tmpPow2-1))
   {
-       throw EXCEPTION("Max size of queue not divisible by power of two");
+    throw EXCEPTION("Max size of queue not divisible by power of two");
   }    
   MaxSize = _MaxSize;
   CurSize = 0;
   pMem = 0;
   try 
   {
-      pMem = new TQueueElement[MaxSize];
+    pMem = new TQueueElement[MaxSize];
   }
   catch(...)
   {
@@ -124,7 +124,7 @@ void TPriorityQueue::Pop(double *key, void **value)
   }
   else
   {
-      throw EXCEPTION("Not can pop element when queue is empty");
+      throw EXCEPTION("Cannot pop element from empty queue");
   }
 
 }

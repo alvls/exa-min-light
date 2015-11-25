@@ -13,13 +13,20 @@ protected:
     queue = new TPriorityQueue(maxSize);  
   }
 
+  void SetUpFullQueue()
+  {
+    queue->Push(2, "b");
+    queue->Push(3, "c");
+    queue->Push(5, "e");
+  }
+
   ~TQueueTest()
   {
     delete queue;
   }
 };
 
-TEST_F(TQueueTest, throws_when_create_with_max_size_queue_not_divisible_by_power_of_two)
+TEST_F(TQueueTest, throws_when_create_queue_with_size_not_divisible_by_power_of_two)
 {
   ASSERT_ANY_THROW(TPriorityQueue q(10));
 }
@@ -34,19 +41,19 @@ TEST_F(TQueueTest, can_create_queue_with_MaxQueueSize)
   ASSERT_NO_THROW(TPriorityQueue q(MaxQueueSize));
 }
 
+TEST_F(TQueueTest, can_create_queue_with_correct_size)
+{
+  ASSERT_NO_THROW(TPriorityQueue q(SIZE));
+}
+
 TEST_F(TQueueTest, can_allocate_memory_for_queue)
 {    
   ASSERT_NO_THROW(TPriorityQueue q(SIZE));
 }
 
-/*TEST_F(TQueueTest, throws_when_memory_for_queue_not_allocated)
+TEST_F(TQueueTest, throws_when_memory_for_queue_not_allocated)
 {    
-  ASSERT_ANY_THROW(TPriorityQueue q(INT_MAX));
-}*/
-
-TEST_F(TQueueTest, can_create_queue_with_correct_value)
-{
-  ASSERT_NO_THROW(TPriorityQueue q(1023));
+  ASSERT_ANY_THROW(TPriorityQueue q(MaxQueueSize * 2 - 1));
 }
 
 TEST_F(TQueueTest, can_create_an_empty_queue)
@@ -65,17 +72,15 @@ TEST_F(TQueueTest, can_push_element)
   ASSERT_EQ(1, queue->GetSize());
 }
 
-TEST_F(TQueueTest, can_detect_when_queue_fill)
+TEST_F(TQueueTest,  can_detect_when_queue_is_full)
 {
   CreateQueue(3);
-  queue->Push(1, "a");
-  queue->Push(2, "b");
-  queue->Push(3, "c");
+  SetUpFullQueue();
 
   ASSERT_TRUE(queue->IsFull());
 }
 
-TEST_F(TQueueTest, can_detect_when_queue_not_fill)
+TEST_F(TQueueTest, can_detect_when_queue_is_not_full)
 {
   CreateQueue(3);
   queue->Push(1, "a");
@@ -99,7 +104,7 @@ TEST_F(TQueueTest, can_pop_element)
   ASSERT_EQ(resValue, (char*)value);
 }
 
-TEST_F(TQueueTest,throw_when_pop_element_from_queue_IsEmpty)
+TEST_F(TQueueTest, throws_when_pop_from_empty_queue)
 {
   double key;
   void* value;
@@ -108,37 +113,63 @@ TEST_F(TQueueTest,throw_when_pop_element_from_queue_IsEmpty)
   ASSERT_ANY_THROW(queue->Pop(&key, &value));
 }
 
-TEST_F(TQueueTest, not_doing_push_when_queue_IsFull_and_insert_element_with_min_key)
+TEST_F(TQueueTest, not_doing_push_to_full_queue_when_element_is_less_then_min_key)
 {
   double key;
   void* value;
   CreateQueue(3);
-  queue->Push(2, "b");
-  queue->Push(3, "c");
-  queue->Push(4, "d");
+  SetUpFullQueue();
 
   queue->Push(1, "a");
+  for(int i = 0; i < 3; i++)
+    queue->Pop(&key, &value);
 
-  queue->Pop(&key, &value);
   ASSERT_NE(1, key);
+  //ASSERT_EQ(2, key);
 }
 
-TEST_F(TQueueTest, can_replace_element_with_minimum_key_when_push_to_fill_queue_insert_element_with_not_min_key)
+TEST_F(TQueueTest, can_push_to_full_queue_when_element_with_largest_key)
 {
   double key;
   void* value;
   CreateQueue(3);
-  queue->Push(1, "a");
-  queue->Push(2, "b");
-  queue->Push(3, "c");
+  SetUpFullQueue();
 
-  queue->Push(4, "d");
+  queue->Push(6, "f");
 
   queue->Pop(&key, &value);
   ASSERT_EQ(4, key);
 }
 
-TEST_F(TQueueTest, can_push_with_priority_element_to_empty_queue)
+TEST_F(TQueueTest, can_push_to_full_queue_when_element_is_greater_then_min_key)
+{
+  double key;
+  void* value;
+  CreateQueue(3);
+  SetUpFullQueue();
+
+  queue->Push(4, "d");
+  for(int i = 0; i < 2; i++)
+    queue->Pop(&key, &value);
+
+  ASSERT_EQ(3, key);
+}
+
+TEST_F(TQueueTest, can_delete_element_with_min_key_when_push_to_full_queue_element_with_greater_key)
+{
+  double key;
+  void* value;
+  CreateQueue(3);
+  SetUpFullQueue();
+
+  queue->Push(4, "d");
+  for(int i = 0; i < 3; i++)
+    queue->Pop(&key, &value);
+
+  ASSERT_NE(2, key);
+}
+
+TEST_F(TQueueTest, can_push_to_empty_queue)
 {
   double key;
   void* value;
@@ -149,7 +180,7 @@ TEST_F(TQueueTest, can_push_with_priority_element_to_empty_queue)
   ASSERT_FALSE(queue->IsEmpty());
 }
 
-TEST_F(TQueueTest, can_push_with_priority_element_to_queue_when_curretn_key_large_then_key_of_min_element)
+TEST_F(TQueueTest, can_push_when_element_is_greater_then_min_key)
 {
   double key;
   void* value;
@@ -163,7 +194,7 @@ TEST_F(TQueueTest, can_push_with_priority_element_to_queue_when_curretn_key_larg
   ASSERT_EQ(2, key);
 }
 
-TEST_F(TQueueTest, can_push_with_priority_element_to_queue_when_curretn_key_equel_key_of_min_element)
+TEST_F(TQueueTest, can_push_when_element_is_equal_to_min_key)
 {
   double key;
   void* value;
@@ -180,7 +211,7 @@ TEST_F(TQueueTest, can_push_with_priority_element_to_queue_when_curretn_key_eque
   ASSERT_EQ(resValue, (char*)value);
 }
 
-TEST_F(TQueueTest, can_replace_element_with_min_key_when_push_with_priority_element_wiht_large_to_fill_queue)
+TEST_F(TQueueTest, can_push_to_full_queue_when_element_is_greater_then_min_key)
 {
   double key;
   void* value;
