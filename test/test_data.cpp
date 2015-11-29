@@ -200,3 +200,38 @@ TEST_F(TSearchDataTest, iterator_can_detect_end_of_data)
 
   ASSERT_TRUE(data->IsEnd());
 }
+
+TEST_F(TSearchDataTest, throw_when_push_to_queue_null_pointer)
+{  
+  CreateSearchData();
+
+  ASSERT_ANY_THROW(data->PushToQueue(0));
+}
+
+TEST_F(TSearchDataTest, can_push_interval_to_queue)
+{  
+  CreateSearchData();
+
+  ASSERT_NO_THROW(data->PushToQueue(new TSearchInterval()));
+}
+
+TEST_F(TSearchDataTest, can_pop_from_queue)
+{  
+  CreateSearchData();
+  TSearchInterval* p;
+  data->PushToQueue(new TSearchInterval());
+
+  ASSERT_NO_THROW(data->PopFromQueue(&p));
+}
+
+TEST_F(TSearchDataTest, can_return_interval_with_max_R)
+{  
+  CreateSearchData();
+  data->PushToQueue(&SetUpInterval(3, 2));
+  data->PushToQueue(&SetUpInterval(2, 5));
+  data->PushToQueue(&SetUpInterval(1, 3));
+
+  TSearchInterval* intervalWithMaxR = data->GetIntervalWithMaxR();
+
+  ASSERT_EQ(5, intervalWithMaxR->R);
+}

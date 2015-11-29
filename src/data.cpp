@@ -326,10 +326,15 @@ void TSearchData::RefillQueue()
 // ------------------------------------------------------------------------------------------------
 void TSearchData::PushToQueue(TSearchInterval *pInterval)
 {
-	//На начальном этапе в очередь записываем все данные
-	if( Count <= DefaultQueueSize ) pQueue->Push(pInterval->R, pInterval);
-	else
-		pQueue->PushWithPriority(pInterval->R, pInterval);
+  if (pInterval == 0)
+  {
+    throw EXCEPTION("Cannot push NULL pointe to queue.");
+  }
+
+  //На начальном этапе в очередь записываем все данные
+  if ( Count <= DefaultQueueSize ) pQueue->Push(pInterval->R, pInterval);
+  else
+    pQueue->PushWithPriority(pInterval->R, pInterval);
 }
 
 // ------------------------------------------------------------------------------------------------
