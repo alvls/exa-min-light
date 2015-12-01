@@ -22,11 +22,19 @@ bool operator<(const TSearchInterval& i1,const TSearchInterval& i2){return (i1.x
 // ------------------------------------------------------------------------------------------------
 TSearchData::TSearchData(/*TParameters _parameters, */int _NumOfFuncs,int _MaxSize)// : parameters(_parameters)
 {
+    if (_MaxSize <= 0)
+    {
+       throw EXCEPTION("MaxSize of SearchData is out of range");
+    }
 	MaxSize = _MaxSize;
 	Count = 0;
 	pRoot = pCur = NULL;
 	pQueue = new TPriorityQueue();
 	//
+    if (_NumOfFuncs > MaxNumOfFunc || _NumOfFuncs <= 0)
+    {
+       throw EXCEPTION("NumOfFunc is out of range");
+    }
 	NumOfFuncs = _NumOfFuncs;
 	for(int i=0;i<NumOfFuncs;i++)
 	{
@@ -318,10 +326,15 @@ void TSearchData::RefillQueue()
 // ------------------------------------------------------------------------------------------------
 void TSearchData::PushToQueue(TSearchInterval *pInterval)
 {
-	//На начальном этапе в очередь записываем все данные
-	if( Count <= DefaultQueueSize ) pQueue->Push(pInterval->R, pInterval);
-	else
-		pQueue->PushWithPriority(pInterval->R, pInterval);
+  if (pInterval == 0)
+  {
+    throw EXCEPTION("Cannot push NULL pointer to queue.");
+  }
+
+  //На начальном этапе в очередь записываем все данные
+  if ( Count <= DefaultQueueSize ) pQueue->Push(pInterval->R, pInterval);
+  else
+    pQueue->PushWithPriority(pInterval->R, pInterval);
 }
 
 // ------------------------------------------------------------------------------------------------
