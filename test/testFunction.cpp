@@ -22,7 +22,7 @@ double function(const double *y)
 {
   double res;// = (y[0]-0.1)*(y[0]-0.1)+0.1;
 
-  res = func(y, 3);
+  res = func(y, 4);
 
   return res;
 }

@@ -660,4 +660,27 @@ double TMethod::GetAchievedAccuracy()
 {
   return AchievedAccuracy;
 }
+
+void TMethod::PrintCurrentStateToFile(char* nameOfFile)
+{
+  FILE* pf;
+  int i, j;
+  pf = fopen(nameOfFile,"a");
+  fprintf(pf, "IterationCount = %d\n", IterationCount);
+  fprintf(pf, "AchievedAccuracy = %lf\n", AchievedAccuracy);
+  fprintf(pf, "recalc = %b\n", recalc);
+  fprintf(pf, "BestTrial.FuncValue = %lf\n", BestTrial.FuncValues[0]);
+  fprintf(pf, "BestTrial.x = %lf\n", BestTrial.x);
+  for (i = 0; i < pTask->GetN(); i++)
+    fprintf(pf, "BestTrial.y[%d] = %lf\n", i, BestTrial.y[i]);
+  for (j = 0; j < NumPoints; j++)
+  {
+    fprintf(pf, "pCurTrials[%d].FuncValue = %lf\n", j, pCurTrials[j].FuncValues[0]);
+    fprintf(pf, "pCurTrials[%d].x = %lf\n", j, pCurTrials[j].x);
+    for (i = 0; i < pTask->GetN(); i++)
+      fprintf(pf, "pCurTrials[%d].y[%d] = %lf\n", j, i, pCurTrials[j].y[i]);
+  }
+  fclose(pf);
+}
+ 
 // - end of file ----------------------------------------------------------------------------------
