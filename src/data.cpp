@@ -328,7 +328,7 @@ void TSearchData::PushToQueue(TSearchInterval *pInterval)
 {
   if (pInterval == 0)
   {
-    throw EXCEPTION("Cannot push NULL pointe to queue.");
+    throw EXCEPTION("Cannot push NULL pointer to queue.");
   }
 
   //На начальном этапе в очередь записываем все данные
