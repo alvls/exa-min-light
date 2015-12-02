@@ -46,15 +46,11 @@ protected:
       double &pCurTrials_FuncValue, double &pCurTrials_x, double* pCurTrials_y)
   {
     char tmp[30];
-    fscanf(pf, "IterationCount = %d", &IterationCount);
+    fscanf(pf, "%s%s%d", tmp, tmp, &IterationCount);
     fscanf(pf, "%s%s%lf", tmp, tmp, &AchievedAccuracy);
-    //fscanf(pf, "AchievedAccuracy = %lf", &AchievedAccuracy);
     fscanf(pf, "%s%s%b", tmp, tmp, &recalc);
-    //fscanf(pf, "recalc = %b", &recalc);
     fscanf(pf, "%s%s%lf", tmp, tmp, &BestTrial_FuncValue);
-    //fscanf(pf, "BestTrial.FuncValue = %lf", &BestTrial_FuncValue);    
     fscanf(pf, "%s%s%lf", tmp, tmp, &BestTrial_x);    
-    //fscanf(pf, "BestTrial.x = %lf", &BestTrial_x);
     for (int i = 0; i <_N; i++)
     {
         fscanf(pf, "%s%s%lf", tmp, tmp, &BestTrial_y[i]);
@@ -274,8 +270,8 @@ TEST_F(TMethodTest, check_states_of_method_iterations)
     }
     else
     { 
-      int countOfIterations = method->GetIterationCount() % 10;
-      while(countOfIterations >= 0)
+      int countOfIterations = (method->GetIterationCount() - 1) / 10;
+      while(countOfIterations > 0)
       {
         ReadIterationFromFile(rightf, IterationCount, AchievedAccuracy, recalc,
             BestTrial_FuncValue, BestTrial_x, BestTrial_y, pCurTrials_FuncValue,
@@ -287,7 +283,7 @@ TEST_F(TMethodTest, check_states_of_method_iterations)
 
         ASSERT_EQ(IterationCount, currentIterationCount);
         ASSERT_DOUBLE_EQ(AchievedAccuracy, currentAchievedAccuracy);
-        ASSERT_EQ(recalc ,currentrecalc);
+        ASSERT_EQ(recalc, currentrecalc);
         ASSERT_DOUBLE_EQ(BestTrial_FuncValue, currentBestTrial_FuncValue);
         ASSERT_DOUBLE_EQ(BestTrial_x, currentBestTrial_x);
         ASSERT_DOUBLE_EQ(pCurTrials_FuncValue, currentpCurTrials_FuncValue);
