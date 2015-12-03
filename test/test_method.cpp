@@ -220,85 +220,84 @@ TEST_F(TMethodTest, CheckStopCondition_can_stop_method_when_required_accuracy_is
 
 TEST_F(TMethodTest, check_states_of_method_iterations)
 {
-    char nameCurrentFile[] = "current_state.dat";
-    int IterationCount;
-    double AchievedAccuracy;
-    bool recalc;
-    double BestTrial_FuncValue;
-    double BestTrial_x;
-    double BestTrial_y[MaxDim];
-    double pCurTrials_FuncValue;
-    double pCurTrials_x;
-    double pCurTrials_y[MaxDim];
+  char nameCurrentFile[] = "current_state.dat";
+  int IterationCount;
+  double AchievedAccuracy;
+  bool recalc;
+  double BestTrial_FuncValue;
+  double BestTrial_x;
+  double BestTrial_y[MaxDim];
+  double pCurTrials_FuncValue;
+  double pCurTrials_x;
+  double pCurTrials_y[MaxDim];
 
-    int currentIterationCount;
-    double currentAchievedAccuracy;
-    bool currentrecalc;
-    double currentBestTrial_FuncValue;
-    double currentBestTrial_x;
-    double currentBestTrial_y[MaxDim];  
-    double currentpCurTrials_FuncValue;
-    double currentpCurTrials_x;
-    double currentpCurTrials_y[MaxDim];
+  int currentIterationCount;
+  double currentAchievedAccuracy;
+  bool currentrecalc;
+  double currentBestTrial_FuncValue;
+  double currentBestTrial_x;
+  double currentBestTrial_y[MaxDim];  
+  double currentpCurTrials_FuncValue;
+  double currentpCurTrials_x;
+  double currentpCurTrials_y[MaxDim];
 
-    bool IsStop = false;
-    FILE* rightf;
+  bool IsStop = false;
+  FILE* rightf;
 
-    FILE* currentf = fopen(nameCurrentFile,"w");
-    fclose(currentf);
+  FILE* currentf = fopen(nameCurrentFile,"w");
+  fclose(currentf);
 
-    CreateMethod();
+  CreateMethod();
 
-    method->SetBounds();
-    method->FirstIteration();
+  method->SetBounds();
+  method->FirstIteration();
 
-    while (!IsStop)
-    {      
-        IsStop = DoIteration();
-
-        if(method->GetIterationCount() % 10 == 0)
-        {  
-            method->PrintCurrentStateToFile(nameCurrentFile);
-        }
+  while (!IsStop)
+  {     
+    if(method->GetIterationCount() % 10 == 0)
+    {  
+      method->PrintCurrentStateToFile(nameCurrentFile);
     }
+    IsStop = DoIteration();
+  }
 
-    rightf = fopen("state.dat","r");
-    currentf = fopen(nameCurrentFile,"r");
-    if(rightf == 0 || currentf == 0)
+  rightf = fopen("state.dat","r");
+  currentf = fopen(nameCurrentFile,"r");
+  if(rightf == 0 || currentf == 0)
+  {
+    ASSERT_TRUE(false);
+  }
+  else
+  { 
+    int countOfIterations = method->GetIterationCount() / 10;
+    while(countOfIterations > 0)
     {
-        ASSERT_TRUE(false);
-    }
-    else
-    { 
-      int countOfIterations = (method->GetIterationCount() - 1) / 10;
-      while(countOfIterations > 0)
+      ReadIterationFromFile(rightf, IterationCount, AchievedAccuracy, recalc,
+          BestTrial_FuncValue, BestTrial_x, BestTrial_y, pCurTrials_FuncValue,
+          pCurTrials_x, pCurTrials_y);
+
+      ReadIterationFromFile(currentf, currentIterationCount, currentAchievedAccuracy,
+          currentrecalc, currentBestTrial_FuncValue, currentBestTrial_x, currentBestTrial_y,
+          currentpCurTrials_FuncValue, currentpCurTrials_x, currentpCurTrials_y);
+
+      ASSERT_EQ(IterationCount, currentIterationCount);
+      ASSERT_DOUBLE_EQ(AchievedAccuracy, currentAchievedAccuracy);
+      ASSERT_EQ(recalc, currentrecalc);
+      ASSERT_DOUBLE_EQ(BestTrial_FuncValue, currentBestTrial_FuncValue);
+      ASSERT_DOUBLE_EQ(BestTrial_x, currentBestTrial_x);
+      ASSERT_DOUBLE_EQ(pCurTrials_FuncValue, currentpCurTrials_FuncValue);
+      ASSERT_DOUBLE_EQ(pCurTrials_x, currentpCurTrials_x);
+      for (int i = 0; i < _N; i++)
       {
-        ReadIterationFromFile(rightf, IterationCount, AchievedAccuracy, recalc,
-            BestTrial_FuncValue, BestTrial_x, BestTrial_y, pCurTrials_FuncValue,
-            pCurTrials_x, pCurTrials_y);
-
-        ReadIterationFromFile(currentf, currentIterationCount, currentAchievedAccuracy,
-            currentrecalc, currentBestTrial_FuncValue, currentBestTrial_x, currentBestTrial_y,
-            currentpCurTrials_FuncValue, currentpCurTrials_x, currentpCurTrials_y);
-
-        ASSERT_EQ(IterationCount, currentIterationCount);
-        ASSERT_DOUBLE_EQ(AchievedAccuracy, currentAchievedAccuracy);
-        ASSERT_EQ(recalc, currentrecalc);
-        ASSERT_DOUBLE_EQ(BestTrial_FuncValue, currentBestTrial_FuncValue);
-        ASSERT_DOUBLE_EQ(BestTrial_x, currentBestTrial_x);
-        ASSERT_DOUBLE_EQ(pCurTrials_FuncValue, currentpCurTrials_FuncValue);
-        ASSERT_DOUBLE_EQ(pCurTrials_x, currentpCurTrials_x);
-        for (int i = 0; i < _N; i++)
-        {
-          ASSERT_DOUBLE_EQ(BestTrial_y[i], currentBestTrial_y[i]);
-          ASSERT_DOUBLE_EQ(pCurTrials_y[i], currentpCurTrials_y[i]);
-        }
-
-        countOfIterations--;
+        ASSERT_DOUBLE_EQ(BestTrial_y[i], currentBestTrial_y[i]);
+        ASSERT_DOUBLE_EQ(pCurTrials_y[i], currentpCurTrials_y[i]);
       }
-      fclose(rightf);
-      fclose(currentf);
-    }
+
+    countOfIterations--;
+  }
+  fclose(rightf);
+  fclose(currentf);
+  }
 }
 
  
