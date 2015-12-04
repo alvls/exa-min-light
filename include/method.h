@@ -98,7 +98,8 @@ public:
   int GetNumPoints();
   TSearchInterval **GetBestIntervals();
   double GetAchievedAccuracy();
- 
+  void PrintCurrentStateToFile(char* nameOfFile);
+
   //отладка
   int pn;
 };

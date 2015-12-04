@@ -28,7 +28,7 @@
 //#endif
 
 #include "method.h"
-
+#include "Rastrigin.h"
 #include "common.h"
 #include "exception.h"
 
@@ -65,15 +65,17 @@ int main(int argc, char* argv[])
   double B[MaxDim] = {1.2, 1.2, 1.2, 1.2, 1.2};
 
   int MaxNumOfTrials = 100000;
-  double eps = 0.0001;
+  double eps = 0.01;
   double r = 2.3;
   double reserv = 0.001; 
-  int m = 5;
-  int L = 5;
+  int m = 10;
+  int L = 1;
   int curl = 0;
-  int N = 3;
+  int N = 4;
   int NumOfFunc = 1;
-  const tFunction f[MaxNumOfFunc] = {&function};
+  //const tFunction f[MaxNumOfFunc] = {&function};
+  const tFunction f[MaxNumOfFunc] = {objfn};
+  bounds(A,B);
   TTask* task = new TTask(N, N, NumOfFunc, A, B, f);
   TSearchData* pData = new TSearchData(NumOfFunc);
   bool IsStop = false;
