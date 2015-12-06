@@ -59,6 +59,18 @@ TEST_F(TEvolventTest, can_get_Y_on_correct_X)
   delete [] y;
 }
 
+TEST_F(TEvolventTest, can_get_X_on_Y)
+{    
+  const int N = 2, m = 2;
+  double y[] = {-0.125, -0.375};
+  double* x = new double[1];
+  CreateEvolvent(N, m);
+
+  evolvent->GetPreimages(y, x);
+
+  ASSERT_DOUBLE_EQ(0.0625, x[0]);
+}
+
 TEST_F(TEvolventTest, throws_when_get_image_with_negative_x)
 {    
   const int N = 2, m = 2;

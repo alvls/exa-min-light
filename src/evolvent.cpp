@@ -320,7 +320,12 @@ void TEvolvent::GetImage(const double& x, double* _y)
 
   memcpy(_y, y, N * sizeof(double));
 }
-
+// ------------------------------------------------------------------------------------------------
+void TEvolvent::GetPreimages(double* _y, double *x)
+{
+  memcpy(y, _y, N * sizeof(double));
+  x[0] = GetXOnY();
+}
 // ------------------------------------------------------------------------------------------------
 TShiftedEvolvent::TShiftedEvolvent(int _N, int _m, int _L):
   TEvolvent(_N, _m)
@@ -474,13 +479,13 @@ void TRotatedEvolvent::GetPreimages(double* _y, double *x)
     double tmpCoord = y[Planes[PlaneIndex][1]];
     y[Planes[PlaneIndex][1]] = -_y[Planes[PlaneIndex][0]];
     y[Planes[PlaneIndex][0]] = tmpCoord;
-/*
+
     if (i > PlaneCount)//Меняем знак преобразования, если число разверток больше числа плоскостей
     {
       y[Planes[PlaneIndex][0]] = -y[Planes[PlaneIndex][0]];
       y[Planes[PlaneIndex][1]] = -y[Planes[PlaneIndex][1]];
     }
-*/
+
     // прообраз для i - 1 развертки
     x[i] = GetXOnY();
   }

@@ -256,7 +256,7 @@ TEST_F(TMethodTest, check_states_of_method_iterations)
   {     
     if(method->GetIterationCount() % 10 == 0)
     {  
-      method->PrintCurrentStateToFile(nameCurrentFile);
+      method->PrintStateToFile(nameCurrentFile);
     }
     IsStop = DoIteration();
   }

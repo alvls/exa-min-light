@@ -661,7 +661,7 @@ double TMethod::GetAchievedAccuracy()
   return AchievedAccuracy;
 }
 
-void TMethod::PrintCurrentStateToFile(char* nameOfFile)
+void TMethod::PrintStateToFile(char* nameOfFile)
 {
   FILE* pf;
   int i, j;
