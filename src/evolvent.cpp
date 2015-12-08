@@ -307,7 +307,7 @@ double TEvolvent::GetXOnY()
 }
 
 //----------------------------------------------------------------------------
-void TEvolvent::GetImage(const double& x, double* _y)
+void TEvolvent::GetImage(const double& x, double* _y, int EvolventNum)
 {
   if ((x < 0) || (x > 1))
   {
@@ -324,6 +324,7 @@ void TEvolvent::GetImage(const double& x, double* _y)
 void TEvolvent::GetPreimages(double* _y, double *x)
 {
   memcpy(y, _y, N * sizeof(double));
+  transform_D_to_P();
   x[0] = GetXOnY();
 }
 // ------------------------------------------------------------------------------------------------
@@ -343,7 +344,7 @@ TShiftedEvolvent::~TShiftedEvolvent()
 }
 
 // ------------------------------------------------------------------------------------------------
-void TShiftedEvolvent::GetImage(const double& x, int EvolventNum, double* _y)
+void TShiftedEvolvent::GetImage(const double& x, double* _y, int EvolventNum)
 {
 }
 
@@ -420,7 +421,7 @@ void TRotatedEvolvent::GetAllPlanes()
 }
 
 // ------------------------------------------------------------------------------------------------
-void TRotatedEvolvent::GetImage(const double& x, int EvolventNum, double* _y)
+void TRotatedEvolvent::GetImage(const double& x, double* _y, int EvolventNum)
 {
   if (EvolventNum == 0 || L == 1)
   {

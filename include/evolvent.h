@@ -44,7 +44,7 @@ public:
   TEvolvent(int _N = 2, int _m = 10);
   virtual ~TEvolvent();
   void SetBounds(const double* _A, const double* _B);
-  virtual void GetImage(const double& x, double* _y);
+  void GetImage(const double& x, double* _y, int EvolventNum = 0);
   virtual void GetPreimages(double* _y, double *x);
 };
 
@@ -56,7 +56,7 @@ protected:
 public:
   TShiftedEvolvent(int _N = 2, int _m = 10, int _L = 0);
   virtual ~TShiftedEvolvent();
-  virtual void GetImage(const double& x, int EvolventNum, double* _y);
+  virtual void GetImage(const double& x, double* _y, int EvolventNum);
   virtual void GetPreimages(double* _y, double *x);
 };
 
@@ -72,7 +72,7 @@ protected:
 public:
   TRotatedEvolvent(int _N = 2, int _m = 10, int _L = 1);
   virtual ~TRotatedEvolvent();
-  virtual void GetImage(const double& x, int EvolventNum, double* _y);
+  virtual void GetImage(const double& x, double* _y, int EvolventNum);
   virtual void GetPreimages(double* _y, double *x);
 };
 

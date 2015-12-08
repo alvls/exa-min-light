@@ -64,7 +64,7 @@ TEST_F(TRotatedEvolventTest, can_get_Y_on_correct_X_when_L_is_one)
   double* y = new double[_N];
   CreateRotatedEvolvent(_N, _m, _L);
 
-  rotatedEvolvent->GetImage(x, 0, y);
+  rotatedEvolvent->GetImage(x, y, 0);
 
   for (int i = 0; i < _N; i++)
     EXPECT_EQ(true_value[i], y[i]);
@@ -80,7 +80,7 @@ TEST_F(TRotatedEvolventTest, can_get_Y_on_correct_X_when_N_is_3_EvolventNum_is_0
   double* y = new double[N];
   CreateRotatedEvolvent(N, _m, L);
 
-  rotatedEvolvent->GetImage(x, 0, y);
+  rotatedEvolvent->GetImage(x, y, 0);
 
   for (int i = 0; i < N; i++)
     EXPECT_EQ(true_value[i], y[i]);
@@ -96,7 +96,7 @@ TEST_F(TRotatedEvolventTest, can_get_Y_on_correct_X_when_N_is_3_EvolventNum_is_1
   double* y = new double[N];
   CreateRotatedEvolvent(N, _m, L);
 
-  rotatedEvolvent->GetImage(x, 1, y);
+  rotatedEvolvent->GetImage(x, y, 1);
 
   for (int i = 0; i < N; i++)
     EXPECT_EQ(true_value[i], y[i]);
@@ -112,7 +112,7 @@ TEST_F(TRotatedEvolventTest, can_get_Y_on_correct_X_when_N_is_3_EvolventNum_is_2
   double* y = new double[N];
   CreateRotatedEvolvent(N, _m, L);
 
-  rotatedEvolvent->GetImage(x, 2, y);
+  rotatedEvolvent->GetImage(x, y, 2);
 
   for (int i = 0; i < N; i++)
     EXPECT_EQ(true_value[i], y[i]);
@@ -128,7 +128,7 @@ TEST_F(TRotatedEvolventTest, can_get_Y_on_correct_X_when_N_is_3_EvolventNum_is_3
   double* y = new double[N];
   CreateRotatedEvolvent(N, _m, L);
 
-  rotatedEvolvent->GetImage(x, 3, y);
+  rotatedEvolvent->GetImage(x, y, 3);
 
   for (int i = 0; i < N; i++)
     EXPECT_EQ(true_value[i], y[i]);
@@ -145,8 +145,8 @@ TEST_F(TRotatedEvolventTest, when_get_Y_on_correct_X_and_N_is_3_first_and_fourth
   double* y_4 = new double[N];
   CreateRotatedEvolvent(N, _m, L);
 
-  rotatedEvolvent->GetImage(x, 1, y_1);
-  rotatedEvolvent->GetImage(x, 4, y_4);
+  rotatedEvolvent->GetImage(x, y_1, 1);
+  rotatedEvolvent->GetImage(x, y_4, 4);
 
   for (int i = 0; i < N; i++)
     EXPECT_EQ(y_1[i], y_4[i]);
