@@ -54,8 +54,10 @@ TTask::~TTask()
 // ------------------------------------------------------------------------------------------------
 void TTask::SetFixed(int _FixedN, double *_FixedY)
 {
-  if (_FixedN != N - FreeN)
+  /*if (_FixedN != N - FreeN)
+  {
     throw EXCEPTION("Not correct FixedN");
+  }*/
   FixedN = _FixedN;
   if (_FixedY == NULL)
     throw EXCEPTION("Pointer FixedY is NULL");
