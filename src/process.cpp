@@ -263,6 +263,8 @@ void TProcess::Solve()
     OptimEstimation = pMethod->GetOptimEstimation();//.FuncValues[pMethod->GetOptimEstimation().index];
     while (!IsOptimumFound)
     {
+      if (!PrintTestInfoFile && (!(pMethod->GetIterationCount()% 10)))
+        printf("process 0, iteration %d \n", pMethod->GetIterationCount());
       DoIteration();
       NewOptimEstimation = pMethod->GetOptimEstimation();
       if (NewOptimEstimation.FuncValues[NewOptimEstimation.index] != 
@@ -299,9 +301,10 @@ void TProcess::Solve()
 
     //  fclose(pf);
     //}
-
-   /* PrintOptimEstimationToConsole(OptimEstimation);*/
-
+  if (!PrintTestInfoFile)
+  {
+    PrintOptimEstimationToConsole(OptimEstimation);
+  }
     //printf("ProcLevel = %d\n", ProcLevel);
     //printf("Iteration = %d \n", pMethod->GetIterationCount());
     ////printf("Point = %d \n",pMethod->GetIterationCount() * parameters.NumPoints);

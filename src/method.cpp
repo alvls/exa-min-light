@@ -33,7 +33,7 @@ TMethod::TMethod(int _MaxNumOfTrials, double _Eps, double _r, double _reserv, in
   }
   MaxNumOfTrials = _MaxNumOfTrials;
 
-  if ((_Eps <= 0.0) || (_Eps > 0.01))
+  if (_Eps <= 0.0)
   {
     throw EXCEPTION("Epsilon is out of range");
   }

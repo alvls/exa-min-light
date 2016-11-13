@@ -99,13 +99,6 @@ TEST_F(TTaskTest, can_create_with_correct_values)
   ASSERT_NO_THROW(TTask task(_N, _FREEN, _NUMOfFUNC, A, B, f));
 }
 
-TEST_F(TTaskTest, throws_when_set_invalid_FixedN_value)
-{
-  CreateTask();
-
-  ASSERT_ANY_THROW(task->SetFixed(_N - _FREEN + 1, A));
-}
-
 TEST_F(TTaskTest, throws_when_set_null_FixedY)
 {
   CreateTask();

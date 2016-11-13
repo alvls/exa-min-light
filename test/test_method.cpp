@@ -76,11 +76,6 @@ TEST_F(TMethodTest, throws_when_create_with_not_positive_epsilon)
   ASSERT_ANY_THROW(TMethod method(_MAX_NUM_OF_TRAILS, 0, _R, _RESERV, _M, _L, _CURL, _NUM_OF_POINTS, task, pData));
 }
 
-TEST_F(TMethodTest, throws_when_create_with_too_large_epsilon)
-{
-  ASSERT_ANY_THROW(TMethod method(_MAX_NUM_OF_TRAILS, 0.011, _R, _RESERV, _M, _L, _CURL, _NUM_OF_POINTS, task, pData));
-}
-
 TEST_F(TMethodTest, throws_when_create_with_too_low_r)
 {
   ASSERT_ANY_THROW(TMethod method(_MAX_NUM_OF_TRAILS, _EPS, 2, _RESERV, _M, _L, _CURL, _NUM_OF_POINTS, task, pData));
