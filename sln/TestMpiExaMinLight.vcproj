@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="TestExaMinLight"
-	ProjectGUID="{5040BCAF-198C-4CB5-95AA-C488571DF816}"
+	Name="TestMpiExaMinLight"
+	ProjectGUID="{81D00452-11D8-4493-90A3-9CFF08FDF02B}"
 	RootNamespace="TestExaMinLight"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
@@ -194,6 +194,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\process.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\queue.cpp"
 				>
 			</File>
@@ -202,31 +206,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\test\test_data.cpp"
+				RelativePath="..\test\test_mpi_main.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\test\test_evolvent.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\test\test_main.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\test\test_method.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\test\test_queue.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\test\test_rotated_evolvent.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\test\test_task.cpp"
+				RelativePath="..\test\test_process.cpp"
 				>
 			</File>
 			<File
@@ -265,6 +249,10 @@
 			</File>
 			<File
 				RelativePath="..\include\performance.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\process.h"
 				>
 			</File>
 			<File
