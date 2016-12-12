@@ -26,7 +26,7 @@
 #include "Rastrigin.h"
 #include "common.h"
 #include "exception.h"
-
+#include "problem_manager.h"
 #include "process.h"
 // ------------------------------------------------------------------------------------------------
 //переводит  char* в int !!бросает исключение
@@ -54,28 +54,35 @@ double parseDouble(const char* arg)
 }
 
 void parseArguments(int argc, char** argv,
-                    int& dimension, double& r,
+                    bool& dimIsSet, int& dimension, double& r,
                     int& m, int& NumOfTaskLevels,
                     double* eps, int* DimInTaskLevel,
-                    int* ChildInProcLevel, int *MaxNumOfPoints, std::string& procType)
+                    int* ChildInProcLevel, int *MaxNumOfPoints, std::string& procType, std::string& libPath)
 {
-  dimension = 4;
+  dimension = 1;
+  dimIsSet = false;
   r = 2.3;
   m = 10;
   NumOfTaskLevels = 1;
+  libPath = "";
   std::string arrayValue;
   int position;
   // проверяем только ключи - аргументы 1, 3, 5 и так далее
   for(int i = 1; i < argc; i+=2)
   {
     // Размерность
-    if (0 == strcmp(argv[i],"-Dimension"))
+    if (0 == strcmp(argv[i],"-libPath"))
+    {
+      libPath = argv[i + 1];
+    }
+    else if (0 == strcmp(argv[i],"-Dimension"))
     {
       dimension = parseInteger(argv[i+1]);
       if ((dimension <= 0) || (dimension > MaxDim))
       {
         throw EXCEPTION("Dimension is out of range\n");
       }
+      dimIsSet = true;
     }
     // Количество уровней в дереве
     else if(0 == strcmp(argv[i],"-NumOfTaskLevels"))
@@ -115,6 +122,10 @@ void parseArguments(int argc, char** argv,
     }
   }
 
+  if (0 == strcmp(libPath.c_str(),""))
+  {
+    throw EXCEPTION("Library path was not set!\n");
+  }
   for(int i = 1; i < argc; i+=2)
   {
     // Точность решения для каждого уровня
@@ -191,20 +202,6 @@ void parseArguments(int argc, char** argv,
       }
     }
   }
-  // проверяем значения DimInTaskLevel
-  int dim = 0;
-  for (int j = 0; j < NumOfTaskLevels; j++)
-  {
-    if (DimInTaskLevel[j] <= 0)
-    {
-      throw EXCEPTION("DimInTaskLevel is out of range");
-    }
-    dim += DimInTaskLevel[j];
-  }
-  if (dim != dimension)
-  {
-    throw EXCEPTION("wrong NumOfTaskLevels");
-  }
 
   // проверяем ChildInProcLevel
   for (int j = 0; j < NumOfTaskLevels - 1; j++)
@@ -244,19 +241,45 @@ void parseArguments(int argc, char** argv,
   }
 }
 // ------------------------------------------------------------------------------------------------
+void PrintParameters(int dimension, double r,
+                    int m, int NumOfTaskLevels,
+                    double *eps, int *DimInTaskLevel,
+                    int *ChildInProcLevel, int *MaxNumOfPoints, std::string libPath)
+{
+  printf("Parameters:\n");
+  printf("    dimension = %d\n", dimension);
+  printf("    r = %.4lf\n", r);
+  printf("    m = %d\n", m);
+  printf("    NumOfTaskLevels = %d\n", NumOfTaskLevels);
+  printf("    DimInTaskLevel = ");
+  for (int i = 0; i < NumOfTaskLevels; i++)
+  {
+    printf("%d_", DimInTaskLevel[i]);
+  }
+  printf("\n    ChildInProcLevel = ");
+  for (int i = 0; i < NumOfTaskLevels; i++)
+  {
+    printf("%d_", ChildInProcLevel[i]);
+  }
+  printf("\n    eps = ");
+  for (int i = 0; i < NumOfTaskLevels; i++)
+  {
+    printf("%.2lf_", eps[i]);
+  }
+  printf("\n    MaxNumOfPoints = ");
+  for (int i = 0; i < NumOfTaskLevels; i++)
+  {
+    printf("%.d_", MaxNumOfPoints[i]);
+  }
+  printf("\n    libPath = %s\n\n", libPath);
+
+}
+// ------------------------------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
-  // задача
-  int dimension; 
-  int NumOfFunc = 1;
-  double A[MaxDim] = {-1.1, -1.1, -1.1, -1.1, -1.1}; 
-  double B[MaxDim] = {1.2, 1.2, 1.2, 1.2, 1.2};
-  tFunction F[MaxNumOfFunc] = {objfn};//{function};
-  bounds(A,B);//Границы поиска
-
   // дерево задач и процессов
   int NumOfTaskLevels; // максимальное число уровней в дереве - 5
-  int DimInTaskLevel[MaxNumOfTaskLevels] = {4};
+  int DimInTaskLevel[MaxNumOfTaskLevels] = {1};
   int ChildInProcLevel[MaxNumOfTaskLevels] = {};
 
   // параметры метода
@@ -266,9 +289,12 @@ int main(int argc, char* argv[])
   double Eps[MaxNumOfTaskLevels] = {0.01, 0.01, 0.01, 0.01, 0.01};
   std::string procType = "SynchronousProcess";
 
-  int ProcRank, ProcNum;
+  int ProcRank = 0, ProcNum = 1;
   int i; 
 
+  string libPath;
+  int dimension;
+  bool dimIsSet = false;
   TProcess *process;
   
   MPI_Init(&argc, &argv);
@@ -283,12 +309,54 @@ int main(int argc, char* argv[])
   try
   {
     parseArguments(argc, argv,
-                   dimension, r,
+                   dimIsSet, dimension, r,
                    m, NumOfTaskLevels,
                    Eps, DimInTaskLevel,
-                   ChildInProcLevel, MaxNumOfPoints, procType);
+                   ChildInProcLevel, MaxNumOfPoints, procType, libPath);
 
-    process = new TProcess(dimension, A, B, NumOfFunc, F, NumOfTaskLevels,
+    TProblemManager manager;
+    if (manager.LoadProblemLibrary(libPath) != TProblemManager::OK_)
+    {
+      //сообщение об ошибке печатает manager
+      return 0;
+    }
+    IProblem* problem = manager.GetProblem();
+
+    if (dimIsSet)
+    {
+      if (problem->SetDimension(dimension) != TProblemManager::OK_)
+      {
+        printf("Unsupported problem dimension!\n");
+        return 0;
+      }
+    }
+      // проверяем значения DimInTaskLevel
+    int dim = 0;
+    for (int j = 0; j < NumOfTaskLevels; j++)
+    {
+      if (DimInTaskLevel[j] <= 0)
+      {
+        throw EXCEPTION("DimInTaskLevel is out of range");
+      }
+      dim += DimInTaskLevel[j];
+    }
+    if (dim != problem->GetDimension())
+    {
+      throw EXCEPTION("wrong DimInTaskLevel");
+    }
+    if (problem->Initialize() != TProblemManager::OK_)
+    {
+      printf("Error during problem initialization\n");
+      return 0;
+    }
+    if (ProcRank == 0)
+    {
+      PrintParameters(dimension, r,
+                      m, NumOfTaskLevels,
+                      Eps, DimInTaskLevel,
+                      ChildInProcLevel, MaxNumOfPoints, libPath);
+    }
+    process = new TProcess(problem, NumOfTaskLevels,
       DimInTaskLevel, ChildInProcLevel, MaxNumOfPoints,
       Eps, r, m);
 

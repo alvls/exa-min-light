@@ -99,7 +99,7 @@ public:
   int GetNumPoints();
   TSearchInterval **GetBestIntervals();
   double GetAchievedAccuracy();
-  void PrintCurrentStateToFile(char* nameOfFile);
+  void PrintStateToFile(const std::string& fileName);
 
   //отладка
   int pn;

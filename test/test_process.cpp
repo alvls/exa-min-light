@@ -1,296 +1,303 @@
-﻿#include "process.h"
-#include "test_common.h"
-#include "Rastrigin.h"
-//#include "testFunction.h"
-
-#include <gtest.h>
-#include "mpi.h"
-
+﻿#include <gtest.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-#define _N 4
-#define _NUM_OF_FUNC 1
-#define _NUM_OF_TASK_LEVELS 1
-#define _R 2.3
-#define _RESERV 0.001
-#define _M 10
+#include "mpi.h"
+#include "process.h"
+#include "common.h"
+#include "test_common.h"
+#include "problem_manager.h"
+using namespace std;
+
+#define RASTRIGIN_PATH "problems/rastrigin/rastrigin.dll"
+#define TESTDATA_PATH "testData/"
+
+/**
+  Вспомогательный класс, помогающий задать начальную конфигурацию объекта класса #TProcess,
+  которая будет использоваться в тестах
+ */
+struct testParameters
+{
+  std::string libName;
+  //std::string actualDataFile;
+  std::string expectedDataFile;
+  int dim;
+  testParameters(std::string _libName,
+                 /*std::string _actualDataFile,*/
+                 std::string _expectedDataFile,
+                 int _dim): 
+  libName(_libName),/* actualDataFile(_actualDataFile),*/ expectedDataFile(_expectedDataFile), dim(_dim) {}
+};
 // ------------------------------------------------------------------------------------------------
-class TProcessTest : public ::testing::Test 
+class TProcessTest : public ::testing::TestWithParam<testParameters>
 {
 protected:
-  double A[MaxDim];
-  double B[MaxDim];
+  static const int curL = 0;
+  static const int L = 1;
+  static const int m = 10;
+  static const int numPoints = 1;
+  static const int n = 4;
 
-  TProcess* process;
-  TProcessTest():  process(0)
-  {}
+  int numOfTaskLevels;
+  int maxNumOfPounts[2];
+  int dimInTaskLevel[2];
+  int childInProcLevel[2];
+  double r;
+  double reserv;
+  double eps[2];
 
-  void CreateProcess(int N = _N, int NumOfFunc = _NUM_OF_FUNC,
-                     int NumOfTaskLevels = _NUM_OF_TASK_LEVELS, 
-                     double r = _R, int m = _M,
-                     int * dimInTaskLevel = NULL,
-                     int * childInProcLevel = NULL,
-                     int * maxNumOfPoints = NULL,
-                     double * eps = NULL)
+  TProcess* pProcess;
+  int ProcRank, ProcNum;
+  TProblemManager manager;
+  IProblem* problem;
+  void SetUp()
   {
-    const tFunction f[MaxNumOfFunc] = {objfn};
-    bounds(A,B);
-    process = new TProcess(N, A, B, NumOfFunc, f, NumOfTaskLevels,
-                           dimInTaskLevel, childInProcLevel, 
-                           maxNumOfPoints, eps, r, m, false, true); 
+    SetUp(std::string(RASTRIGIN_PATH), n);
   }
 
-  ~TProcessTest()
+  void TearDown()
   {
-    delete process;
+  }
+
+  void SetUp(string libName, int n)
+  {
+    int NumOfFuncs = 1;
+    r = 2.3;
+    reserv = 0.001;
+    eps[0] = eps[1] = 0.01;
+    numOfTaskLevels = 1;
+    maxNumOfPounts[0] = maxNumOfPounts[1] = 10000;
+    dimInTaskLevel[0] = n;
+    dimInTaskLevel[1] = 0;
+    childInProcLevel[0] = childInProcLevel[1] = 0;
+    FILE* configFile = fopen("test_config.txt","r");
+    char path[255];
+    fscanf(configFile, "%s", &path);
+    fclose(configFile);
+
+    std::string libPath = std::string(path)+ RASTRIGIN_PATH;
+    if (TProblemManager::OK_ == manager.LoadProblemLibrary(libPath))
+    {
+      problem = manager.GetProblem();
+      problem->SetDimension(n);
+      /*problem->SetConfigPath(NULL);*/
+      problem->Initialize();
+    }
+    if (MPI_Comm_size(MPI_COMM_WORLD, &ProcNum) != MPI_SUCCESS)
+    {
+      throw EXCEPTION("Error in MPI_Comm_size call");
+    }
+    if (MPI_Comm_rank(MPI_COMM_WORLD, &ProcRank) != MPI_SUCCESS)
+    {
+      throw EXCEPTION("Error in MPI_Comm_rank call");
+    }
   }
 };
 
-TEST_F(TProcessTest, no_throws_when_create_with_correct_values)
-{
-  int MaxNumOfPoints[] = {10000, 10000};
-  double Eps[] = {0.01, 0.01};
-  int NumOfTaskLevels = 2;
-  int DimInTaskLevel[] = {2, 2};
-  int ChildInProcLevel[] = {3, 0};
-  int ProcRank, ProcNum;
-  if (MPI_Comm_size(MPI_COMM_WORLD, &ProcNum) != MPI_SUCCESS)
-  {
-    throw EXCEPTION("Error in MPI_Comm_size call");
-  }
-  if (MPI_Comm_rank(MPI_COMM_WORLD, &ProcRank) != MPI_SUCCESS)
-  {
-    throw EXCEPTION("Error in MPI_Comm_rank call");
-  }
-
-  if (ProcNum == 4)
-  {
-    ASSERT_NO_THROW(CreateProcess(_N, _NUM_OF_FUNC, NumOfTaskLevels, 
-      _R, _M, DimInTaskLevel, ChildInProcLevel,
-      MaxNumOfPoints, Eps));
-  }
-  else
-  {
-    ASSERT_TRUE(true);
-  }
-}
-
+/**
+ * Проверка параметра Количество уровней в дереве #NumOfTaskLevels
+ * NumOfTaskLevels >=1
+ */
 TEST_F(TProcessTest, throws_when_create_with_not_positive_NumOfTaskLevels)
 {
-  int MaxNumOfPoints[] = {10000, 10000};
-  double Eps[] = {0.01, 0.01};
-  int NumOfTaskLevels = 0;
-  int DimInTaskLevel[] = {_N, 0};
-  int ChildInProcLevel[] = {0, 0};
-
-  ASSERT_ANY_THROW(CreateProcess(_N, _NUM_OF_FUNC, NumOfTaskLevels, 
-    _R, _M, DimInTaskLevel, ChildInProcLevel,
-    MaxNumOfPoints, Eps));
+  if (ProcRank == 0)
+  {
+    ASSERT_ANY_THROW(new TProcess(problem, 0,
+                                  dimInTaskLevel, childInProcLevel, 
+                                  maxNumOfPounts, eps, r, m, false, true));
+  }
 }
 
-TEST_F(TProcessTest, throws_when_create_with_not_positive_Dim)
-{
-  int MaxNumOfPoints[] = {10000, 10000};
-  double Eps[] = {0.01, 0.01};
-  int NumOfTaskLevels = _NUM_OF_TASK_LEVELS;
-  int DimInTaskLevel[] = {_N, 0};
-  int ChildInProcLevel[] = {0, 0};
-
-  ASSERT_ANY_THROW(CreateProcess(0, _NUM_OF_FUNC, NumOfTaskLevels, 
-    _R, _M, DimInTaskLevel, ChildInProcLevel,
-    MaxNumOfPoints, Eps));
-}
-
+/**
+ * Проверка параметра надежности метода #r
+ * r > 2
+ */
 TEST_F(TProcessTest, throws_when_create_with_r_out_of_range)
 {
-  int MaxNumOfPoints[] = {10000, 10000};
-  double Eps[] = {0.01, 0.01};
-  int NumOfTaskLevels = _NUM_OF_TASK_LEVELS;
-  int DimInTaskLevel[] = {_N, 0};
-  int ChildInProcLevel[] = {0, 0};
-
-  ASSERT_ANY_THROW(CreateProcess(_N, _NUM_OF_FUNC, NumOfTaskLevels, 
-    1, _M, DimInTaskLevel, ChildInProcLevel,
-    MaxNumOfPoints, Eps));
+  if (ProcRank == 0)
+  {
+    ASSERT_ANY_THROW(new TProcess(problem, numOfTaskLevels,
+                                  dimInTaskLevel, childInProcLevel, 
+                                  maxNumOfPounts, eps, 2, m, false, true));
+  }
 }
 
+/**
+ * Проверка параметра Плотность построения развертки #m
+ * 2 <= m <= MaxM
+ */
 TEST_F(TProcessTest, throws_when_create_with_m_out_of_range)
 {
-  int MaxNumOfPoints[] = {10000, 10000};
-  double Eps[] = {0.01, 0.01};
-  int NumOfTaskLevels = _NUM_OF_TASK_LEVELS;
-  int DimInTaskLevel[] = {_N, 0};
-  int ChildInProcLevel[] = {0, 0};
-
-  ASSERT_ANY_THROW(CreateProcess(_N, _NUM_OF_FUNC, NumOfTaskLevels, 
-    _R, 1, DimInTaskLevel, ChildInProcLevel,
-    MaxNumOfPoints, Eps));
+  if (ProcRank == 0)
+  {
+    ASSERT_ANY_THROW(new TProcess(problem, numOfTaskLevels,
+                                dimInTaskLevel, childInProcLevel, 
+                                maxNumOfPounts, eps, r, 1, false, true));
+  }
 }
 
+/**
+ * Проверка параметра Точность решения задачи #Eps
+ * Eps > 0
+ */
 TEST_F(TProcessTest, throws_when_create_with_eps_out_of_range)
 {
-  int MaxNumOfPoints[] = {10000, 10000};
-  double Eps[] = {0.011, 0.01};
-  int NumOfTaskLevels = _NUM_OF_TASK_LEVELS;
-  int DimInTaskLevel[] = {_N, 0};
-  int ChildInProcLevel[] = {0, 0};
-
-  ASSERT_ANY_THROW(CreateProcess(_N, _NUM_OF_FUNC, NumOfTaskLevels, 
-    _R, _M, DimInTaskLevel, ChildInProcLevel,
-    MaxNumOfPoints, Eps));
+  if (ProcRank == 0)
+  {
+    eps[0] = 0.0;
+    ASSERT_ANY_THROW(new TProcess(problem, numOfTaskLevels,
+                                dimInTaskLevel, childInProcLevel, 
+                                maxNumOfPounts, eps, r, m, false, true));
+  }
 }
 
+/**
+ * Проверка параметра максимальное число итераций для процессов на каждом уровне #MaxNumOfPoints
+ * MaxNumOfPoints > 0
+ */
 TEST_F(TProcessTest, throws_when_create_with_MaxNumOfPoints_out_of_range)
 {
-  int MaxNumOfPoints[] = {-1, 10000};
-  double Eps[] = {0.01, 0.01};
-  int NumOfTaskLevels = _NUM_OF_TASK_LEVELS;
-  int DimInTaskLevel[] = {_N, 0};
-  int ChildInProcLevel[] = {0, 0};
-
-  ASSERT_ANY_THROW(CreateProcess(_N, _NUM_OF_FUNC, NumOfTaskLevels, 
-    _R, _M, DimInTaskLevel, ChildInProcLevel,
-    MaxNumOfPoints, Eps));
+  if (ProcRank == 0)
+  {
+    maxNumOfPounts[0] = 0;
+    ASSERT_ANY_THROW(new TProcess(problem, numOfTaskLevels,
+                                dimInTaskLevel, childInProcLevel, 
+                                maxNumOfPounts, eps, r, m, false, true));
+  }
 }
 
+/**
+ * Проверка параметра Размерность процессов на каждом уровне #DimInTaskLevel
+ * DimInTaskLevel > 0
+ * сумма размерностей на всех уровнях = общей размерности
+ */
 TEST_F(TProcessTest, throws_when_create_with_DimInTaskLevel_out_of_range)
 {
-  int MaxNumOfPoints[] = {10000, 10000};
-  double Eps[] = {0.01, 0.01};
-  int NumOfTaskLevels = _NUM_OF_TASK_LEVELS;
-  int DimInTaskLevel[] = {-1, 0};
-  int ChildInProcLevel[] = {0, 0};
-
-  ASSERT_ANY_THROW(CreateProcess(_N, _NUM_OF_FUNC, NumOfTaskLevels, 
-    _R, _M, DimInTaskLevel, ChildInProcLevel,
-    MaxNumOfPoints, Eps));
+  if (ProcRank == 0)
+  {
+    dimInTaskLevel[0] = 0;
+    ASSERT_ANY_THROW(new TProcess(problem, numOfTaskLevels,
+                                dimInTaskLevel, childInProcLevel, 
+                                maxNumOfPounts, eps, r, m, false, true));
+  }
 }
 
 TEST_F(TProcessTest, throws_when_create_with_illegal_value_DimInTaskLevel)
 {
-  int MaxNumOfPoints[] = {10000, 10000};
-  double Eps[] = {0.01, 0.01};
-  int NumOfTaskLevels = 2;
-  int DimInTaskLevel[] = {2, 1};
-  int ChildInProcLevel[] = {3, 0};
+  if (ProcRank == 0)
+  {
+    numOfTaskLevels = 2;
+    dimInTaskLevel[0] = 2;
+    dimInTaskLevel[1] = 1;
+    childInProcLevel[0] = 3;
 
-  ASSERT_ANY_THROW(CreateProcess(_N, _NUM_OF_FUNC, NumOfTaskLevels, 
-    _R, _M, DimInTaskLevel, ChildInProcLevel,
-    MaxNumOfPoints, Eps));
+    ASSERT_ANY_THROW(new TProcess(problem, numOfTaskLevels,
+                                  dimInTaskLevel, childInProcLevel, 
+                                  maxNumOfPounts, eps, r, m, false, true));
+  }
 }
 
+/**
+ * Проверка параметра Размерность процессов на каждом уровне #ChildInProcLevel
+ * ChildInProcLevel >=0 0
+ * сумма размерностей на всех уровнях = общей размерности
+ */
 TEST_F(TProcessTest, throws_when_create_with_ChildInProcLevel_out_of_range)
 {
-  int MaxNumOfPoints[] = {10000, 10000};
-  double Eps[] = {0.01, 0.01};
-  int NumOfTaskLevels = 1;
-  int DimInTaskLevel[] = {4, 0};
-  int ChildInProcLevel[] = {-1, 0};
-
-  ASSERT_ANY_THROW(CreateProcess(_N, _NUM_OF_FUNC, NumOfTaskLevels, 
-    _R, _M, DimInTaskLevel, ChildInProcLevel,
-    MaxNumOfPoints, Eps));
+  if (ProcRank == 0)
+  {
+    childInProcLevel[0] = -1;
+    ASSERT_ANY_THROW(new TProcess(problem, numOfTaskLevels,
+                                  dimInTaskLevel, childInProcLevel, 
+                                  maxNumOfPounts, eps, r, m, false, true));
+  }
 }
+
+// работает при запуске 4х процессов
 TEST_F(TProcessTest, throws_when_create_with_illegal_value_ChildInProcLevel)
 {
-  int MaxNumOfPoints[] = {10000, 10000};
-  double Eps[] = {0.01, 0.01};
-  int NumOfTaskLevels = 2;
-  int DimInTaskLevel[] = {2, 2};
-  int ChildInProcLevel[] = {2, 0};
-  int ProcRank, ProcNum;
-    if (MPI_Comm_size(MPI_COMM_WORLD, &ProcNum) != MPI_SUCCESS)
-  {
-    throw EXCEPTION("Error in MPI_Comm_size call");
-  }
-  if (MPI_Comm_rank(MPI_COMM_WORLD, &ProcRank) != MPI_SUCCESS)
-  {
-    throw EXCEPTION("Error in MPI_Comm_rank call");
-  }
+  numOfTaskLevels = 2;
+  dimInTaskLevel[0] = dimInTaskLevel[2] = 2;
+  childInProcLevel[0] = 2;
 
   if (ProcNum == 4)
   {
-    ASSERT_ANY_THROW(CreateProcess(_N, _NUM_OF_FUNC, NumOfTaskLevels, 
-      _R, _M, DimInTaskLevel, ChildInProcLevel,
-      MaxNumOfPoints, Eps));
+    ASSERT_ANY_THROW(new TProcess(problem, numOfTaskLevels,
+                                  dimInTaskLevel, childInProcLevel, 
+                                  maxNumOfPounts, eps, r, m, false, true));
   }
   else
   {
     ASSERT_TRUE(true);
   }
 }
-TEST_F(TProcessTest, check_states_of_method_one_process)
+/**
+ * Создание процесса с корректными входными параметрами
+ * работает при запуске 4х процессов
+ */
+TEST_F(TProcessTest, no_throws_when_create_with_correct_values)
 {
-  char currentFile[] = "current_state.dat";
-  int MaxNumOfPoints[] = {10000, 10000};
-  double Eps[] = {0.01, 0.01};
-  int ProcRank, ProcNum;
-  int NumOfTaskLevels = _NUM_OF_TASK_LEVELS;
-  int DimInTaskLevel[] = {_N, 0};
-  int ChildInProcLevel[] = {0, 0};
-
-  if (MPI_Comm_size(MPI_COMM_WORLD, &ProcNum) != MPI_SUCCESS)
+  numOfTaskLevels = 2;
+  dimInTaskLevel[0] = dimInTaskLevel[1] = 2;
+  childInProcLevel[0] = 3;
+  if (ProcNum == 4)
   {
-    throw EXCEPTION("Error in MPI_Comm_size call");
+    ASSERT_NO_THROW(new TProcess(problem, numOfTaskLevels,
+                                  dimInTaskLevel, childInProcLevel, 
+                                  maxNumOfPounts, eps, r, m, false, true));
   }
-  if (MPI_Comm_rank(MPI_COMM_WORLD, &ProcRank) != MPI_SUCCESS)
-  {
-    throw EXCEPTION("Error in MPI_Comm_rank call");
-  }
-
-  if (ProcNum == 1)
-  {
-    CreateProcess(_N, _NUM_OF_FUNC, NumOfTaskLevels, 
-                  _R, _M, DimInTaskLevel, ChildInProcLevel,
-                  MaxNumOfPoints, Eps);
-
-    process->Solve();
-
-    CheckMetodIteration("state.dat", currentFile,
-      process->GetIterationCountRoot() / 10);
-  }
-  else 
+  else
   {
     ASSERT_TRUE(true);
   }
 }
-
-TEST_F(TProcessTest, check_states_of_method_MPI_tree)
+/**
+ * Проверка решения задач
+ */
+TEST_F(TProcessTest, check_states_of_process)
 {
-  char currentFile[] = "current_state.dat";
-  int MaxNumOfPoints[] = {10000, 10000};
-  double Eps[] = {0.01, 0.01};
-  int ProcRank, ProcNum;
-  int NumOfTaskLevels = 2;
-  int DimInTaskLevel[] = {2, 2};
-  int ChildInProcLevel[] = {3, 0};
-
-  if (MPI_Comm_size(MPI_COMM_WORLD, &ProcNum) != MPI_SUCCESS)
+  std::string actualDataFile;
+  std::string expectedDataFile;
+  if (ProcRank == 0)
   {
-    throw EXCEPTION("Error in MPI_Comm_size call");
-  }
-  if (MPI_Comm_rank(MPI_COMM_WORLD, &ProcRank) != MPI_SUCCESS)
-  {
-    throw EXCEPTION("Error in MPI_Comm_rank call");
-  }
+    actualDataFile = "current_state.dat";
+    FILE* configFile = fopen("test_config.txt","r");
+    char path[255];
+    fscanf(configFile, "%s", &path);
+    fclose(configFile);
+    if (ProcNum == 1)
+    {
+      expectedDataFile = std::string(path) + std::string(TESTDATA_PATH) +
+        std::string("expectedRastriginState.dat");
+    }
+    else
+    {
+      expectedDataFile = std::string(path) + std::string(TESTDATA_PATH) +
+        std::string("expectedRastriginStateTree.dat");
+    }
 
+    FILE* currentf = fopen(actualDataFile.c_str(),"w");
+    fclose(currentf);
+  }
   if (ProcNum == 4)
   {
-    CreateProcess(_N, _NUM_OF_FUNC, NumOfTaskLevels, 
-                  _R, _M, DimInTaskLevel, ChildInProcLevel,
-                  MaxNumOfPoints, Eps);
+    numOfTaskLevels = 2;
+    dimInTaskLevel[0] = dimInTaskLevel[1] = 2;
+    childInProcLevel[0] = 3;
+  }
+ 
+  if ((ProcNum == 4) || (ProcNum == 1))
+  {
+    TProcess* pProcess = new TProcess(problem, numOfTaskLevels,
+                                       dimInTaskLevel, childInProcLevel, 
+                                       maxNumOfPounts, eps, r, m, false, true);
 
-    process->Solve();
-
+    pProcess->Solve();
     if (ProcRank == 0)
     {
-      CheckMetodIteration("state_tree.dat", currentFile,
-        process->GetIterationCountRoot() / 10);
+      CheckMetodIteration(expectedDataFile, actualDataFile,
+                          pProcess->GetIterationCountRoot() / 10);
     }
-  }
-  else 
-  {
-    ASSERT_TRUE(true);
+    delete pProcess;
   }
 }

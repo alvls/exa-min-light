@@ -373,7 +373,8 @@ void TMethod::CalculateFunctionals()
     for (j = 0; j < pTask->GetNumOfFunc(); j++)
     {
       //      NumberOfEvaluations[i]++;
-      pCurTrials[i].FuncValues[j] = pTask->GetFuncs()[j](pCurTrials[i].y);
+      pCurTrials[i].FuncValues[j] = pTask->CalculateFuncs(pCurTrials[i].y, j);
+      //pCurTrials[i].FuncValues[j] = pTask->GetFuncs()[j](pCurTrials[i].y);
       if (j == pTask->GetNumOfFunc()-1 || pCurTrials[i].FuncValues[j] > 0)
       {
         pCurTrials[i].index = j;
@@ -691,14 +692,14 @@ double TMethod::GetAchievedAccuracy()
   return AchievedAccuracy;
 }
 
-void TMethod::PrintCurrentStateToFile(char* nameOfFile)
+void TMethod::PrintStateToFile(const std::string& fileName)
 {
   FILE* pf;
   int i, j;
-  pf = fopen(nameOfFile,"a");
+  pf = fopen(fileName.c_str(),"a");
   fprintf(pf, "IterationCount = %d\n", IterationCount);
   fprintf(pf, "AchievedAccuracy = %lf\n", AchievedAccuracy);
-  fprintf(pf, "recalc = %b\n", recalc);
+  fprintf(pf, "recalc = %i\n", recalc == true ? 1 : 0);
   fprintf(pf, "BestTrial.FuncValue = %lf\n", BestTrial.FuncValues[0]);
   fprintf(pf, "BestTrial.x = %lf\n", BestTrial.x);
   for (i = 0; i < pTask->GetN(); i++)

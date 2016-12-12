@@ -28,8 +28,7 @@ void ShowIterResults(TProcess *pProcess)
 }
 
 // ------------------------------------------------------------------------------------------------
-TProcess::TProcess(int _N, double *_A, double *_B, int _NumOfFunc,
-                   const tFunction* _F,  int _NumOfTaskLevels, 
+TProcess::TProcess(IProblem* _problem,  int _NumOfTaskLevels, 
                    int *_DimInTaskLevel, int *_ChildInProcLevel,
                    int *_MaxNumOfPoints, double *_Eps, double _r, int _m, bool _IsPrintFile, bool _PrintTestInfoFile) 
 {
@@ -55,7 +54,7 @@ TProcess::TProcess(int _N, double *_A, double *_B, int _NumOfFunc,
   {
     dimTmp += _DimInTaskLevel[i];
   }
-  if (dimTmp != _N)
+  if (dimTmp != _problem->GetDimension())
   {
     throw string("Illegal value of DimInTaskLevel");
   }
@@ -81,8 +80,8 @@ TProcess::TProcess(int _N, double *_A, double *_B, int _NumOfFunc,
 
   InitProcess();
 
-  pTask = new TTask(_N, DimInTaskLevel[ProcLevel], _NumOfFunc, _A, _B, _F);
-  pData = new TSearchData(/*parameters,*/ _NumOfFunc, DefaultSearchDataSize);
+  pTask = new TTask(_problem->GetDimension(), DimInTaskLevel[ProcLevel], _problem);
+  pData = new TSearchData(/*parameters,*/ _problem->GetNumberOfFunctions(), DefaultSearchDataSize);
 
   // число порождаемых точек на итерации совпадает с числом потомков в дереве процессов,
   //  если процесс - не лист
@@ -444,7 +443,7 @@ void TProcess::DoIteration()
   if(pMethod->GetIterationCount() % 10 == 0 && ProcRank == 0)
   {  
     //printf("PrintCurrentStateToFile  %d \n", pMethod->GetIterationCount());
-    pMethod->PrintCurrentStateToFile("current_state.dat");
+    pMethod->PrintStateToFile("current_state.dat");
   }
   pMethod->InitIteration();
   ReceiveLockPoints();

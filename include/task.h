@@ -16,6 +16,7 @@
 #define __TASK_H__
 
 #include "common.h"
+#include "problem_interface.h"
 
 // ------------------------------------------------------------------------------------------------
 class TTask
@@ -25,17 +26,22 @@ protected:
   double     A[MaxDim];      // левая граница области поиска
   double     B[MaxDim];      // правая граница области поиска
   int        NumOfFunc;      // число функционалов (последний - критерий)
-  tFunction* Funcs;          // фунционалы
+  IProblem*  pProblem;       // указатель на саму задачу оптимизации
+//  tFunction* Funcs;          // фунционалы
   int        FreeN;          // размерность подзадачи
 
   int        FixedN;         // число фиксированных размерностей
                              //   чем "ниже" уровень задача в дереве задач, тем больше FixedN
   double     FixedY[MaxDim]; // значения фиксированных переменных
                              // включая значения переменных, зафиксированных на уровнях выше
+  double     OptimumValue;   // оптимальное значение целевой функции (определено, если известно из задачи)
+  double     OptimumPoint[MaxDim]; //координаты глобального минимума целевой функции (определено, если известно)
+  bool       IsOptimumValueDefined; //true, если в задаче известно оптимальное значение критерия
+  bool       IsOptimumPointDefined; //true, если в задаче известна точка глобального минимума
 
   void CheckBounds() const;
 public:
-  TTask(int _N, int _FreeN, int _NumOfFunc, double *_A, double *_B, const tFunction *_Funcs);
+  TTask(int _N, int _FreeN, IProblem* _problem);
   ~TTask();
   void SetFixed(int _FixedN, double *_FixedY);
   int GetN() const { return N; }
@@ -45,7 +51,13 @@ public:
   double* GetB() { return B; }
   int GetFixedN() const { return FixedN; }
   double* GetFixedY() { return FixedY; }
-  tFunction* GetFuncs(){ return Funcs; }
+  //tFunction* GetFuncs(){ return Funcs; }
+  double GetOptimumValue() const { return OptimumValue; }
+  const double* GetOptimumPoint() const { return OptimumPoint; }
+  bool GetIsOptimumValueDefined() const { return IsOptimumValueDefined; }
+  bool GetIsOptimumPointDefined() const { return IsOptimumPointDefined; }
+  double CalculateFuncs(const double *y, int fNumber)
+    { return pProblem->CalculateFunctionals(y, fNumber); }
 };
 
 #endif

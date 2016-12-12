@@ -21,7 +21,7 @@
 #include "exception.h"
 /*#include "parameters.h"*/
 #include "performance.h"
-
+#include "problem_interface.h"
 //extern const int MaxNumOfTaskLevels;
 
 // ------------------------------------------------------------------------------------------------
@@ -87,7 +87,7 @@ protected:
   void ReceiveLockPoints();
   void ReceiveCalcPoints();
 public:
-  TProcess(int _N, double *_A, double *_B, int _NumOfFunc, const tFunction* _F,
+  TProcess(IProblem* _problem,
            int _NumOfTaskLevels, int *_DimInTaskLevel, int *_ChildInProcLevel,
            int *_MaxNumOfPoints, double *_Eps, double _r, int _m, bool _IsPrintFile = false, bool _PrintTestInfoFile = false);
   ~TProcess();
