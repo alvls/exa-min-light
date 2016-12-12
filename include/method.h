@@ -101,6 +101,7 @@ public:
   double GetAchievedAccuracy();
   void PrintStateToFile(const std::string& fileName);
 
+
   //отладка
   int pn;
 };

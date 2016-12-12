@@ -226,6 +226,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\test\test_rotated_evolvent.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\test\test_task.cpp"
 				>
 			</File>
