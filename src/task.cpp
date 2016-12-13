@@ -12,12 +12,12 @@
 * http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
 */
 
-#include "string.h"
 #include "exception.h"
 #include "task.h"
+#include <cstring>
 
 // ------------------------------------------------------------------------------------------------
-TTask::TTask(int _N, int _FreeN, int _NumOfFunc, double *_A, double *_B, const tFunction *_Funcs)
+TTask::TTask(int _N, int _FreeN, IProblem *_problem)
 {
   if ((_N <= 0) || (_N > MaxDim))
     throw EXCEPTION("N is out of range");
@@ -25,30 +25,27 @@ TTask::TTask(int _N, int _FreeN, int _NumOfFunc, double *_A, double *_B, const t
   if ((_FreeN <= 0) || (_FreeN > N))
     throw EXCEPTION("FreeN is out of range");
   FreeN = _FreeN;
-  if ((_NumOfFunc <= 0) || (_NumOfFunc > MaxNumOfFunc))
+  NumOfFunc = _problem->GetNumberOfFunctions();
+  if ((NumOfFunc <= 0) || (NumOfFunc > MaxNumOfFunc))
     throw EXCEPTION("NumOfFunc is out of range");
-  NumOfFunc = _NumOfFunc;
-  if (_A == NULL)
+  _problem->GetBounds(A, B);
+  IsOptimumPointDefined = _problem->GetOptimumPoint(OptimumPoint) == IProblem::OK ? true : false;
+  IsOptimumValueDefined = _problem->GetOptimumValue(OptimumValue) == IProblem::OK ? true : false;
+  pProblem = _problem;
+  if (A == NULL)
     throw EXCEPTION("Pointer A is NULL");
-  memcpy(A, _A, N * sizeof(double));
-  if (_B == NULL)
+  if (B == NULL)
     throw EXCEPTION("Pointer B is NULL");
-  memcpy(B, _B, N * sizeof(double));
-  Funcs = new tFunction[NumOfFunc];
-  if (Funcs == NULL)
-    throw EXCEPTION("Not enough memory to store Funcs");
-  if (_Funcs == NULL)
-    throw EXCEPTION("Pointer Funcs is NULL");
-  memcpy(Funcs, _Funcs, NumOfFunc * sizeof(tFunction));
+  if (pProblem == NULL)
+    throw EXCEPTION("Pointer pProblem is NULL");
 
   // По умолчанию фиксированные переменные отсутствуют
-  FixedN =  0;
+  FixedN = 0;
 }
 
 // ------------------------------------------------------------------------------------------------
 TTask::~TTask()
 {
-  delete [] Funcs;
 }
 
 // ------------------------------------------------------------------------------------------------

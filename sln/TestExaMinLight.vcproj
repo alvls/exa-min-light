@@ -21,7 +21,7 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			CharacterSet="1"
+			CharacterSet="2"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -194,6 +194,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\problem_manager.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\queue.cpp"
 				>
 			</File>
@@ -227,10 +231,6 @@
 			</File>
 			<File
 				RelativePath="..\test\test_task.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\test\testFunction.cpp"
 				>
 			</File>
 		</Filter>
@@ -268,6 +268,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\include\problem_interface.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\problem_manager.h"
+				>
+			</File>
+			<File
 				RelativePath="..\include\queue.h"
 				>
 			</File>
@@ -281,10 +289,6 @@
 			</File>
 			<File
 				RelativePath="..\test\test_common.h"
-				>
-			</File>
-			<File
-				RelativePath="..\test\testFunction.h"
 				>
 			</File>
 		</Filter>

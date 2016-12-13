@@ -16,22 +16,19 @@
 #define __DATA_H__
 
 #include "common.h"
-//#include "extended.h"
 #include "queue.h"
 #include <stack>
-//#include "parameters.h"
-//#include <vector>
 #include <string.h>
 using namespace std;
 
 // ------------------------------------------------------------------------------------------------
 struct TTrial
 {
-  double x;
-  double y[MaxDim];
-  double FuncValues[MaxNumOfFunc];
-  int index;
-  int K;
+  double x;                        //точка на одномерном отрезке
+  double y[MaxDim];                //точка в многомерном пространстве
+  double FuncValues[MaxNumOfFunc]; //значения функций задачи, вычисленные до первого нарушенного
+  int index;                       //индекс точки
+  int K;                           // число "вложенных" итераций
 };
 
 // ------------------------------------------------------------------------------------------------

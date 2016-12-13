@@ -21,7 +21,7 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			CharacterSet="1"
+			CharacterSet="2"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -194,6 +194,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\problem_manager.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\process.cpp"
 				>
 			</File>
@@ -233,6 +237,14 @@
 			</File>
 			<File
 				RelativePath="..\include\performance.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\problem_interface.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\problem_manager.h"
 				>
 			</File>
 			<File

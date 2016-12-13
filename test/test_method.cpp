@@ -1,219 +1,304 @@
-﻿#include "method.h"
-#include "testFunction.h"
-#include "Rastrigin.h"
-#include <gtest.h>
-#include "common.h"
-#include "test_common.h"
-
+﻿#include <gtest.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+#include "method.h"
+#include "common.h"
+#include "test_common.h"
+#include "problem_manager.h"
+using namespace std;
 
-#define _EPS 0.01
-#define _MAX_NUM_OF_TRAILS 10000
-#define _R 2.3
-#define _RESERV 0.001
-#define _M 10
-#define _L 1
-#define _NUM_OF_FUNC 1
-#define _N 4
-#define _CURL 0
-#define _NUM_OF_POINTS 1
-// ------------------------------------------------------------------------------------------------
-class TMethodTest : public ::testing::Test 
+#define RASTRIGIN_PATH "..//problems//rastrigin//rastrigin.dll"
+#define TESTDATA_PATH "..//testData//"
+/**
+  Вспомогательный класс, помогающий задать начальную конфигурацию объекта класса #TMethod,
+  которая будет использоваться в тестах
+ */
+struct testParameters
+{
+  std::string libName;
+  std::string actualDataFile;
+  std::string expectedDataFile;
+  int dim;
+  testParameters(std::string _libName,
+                 std::string _actualDataFile,
+                 std::string _expectedDataFile,
+                 int _dim): 
+  libName(_libName), actualDataFile(_actualDataFile), expectedDataFile(_expectedDataFile), dim(_dim) {}
+};
+
+class TMethodTest : public ::testing::TestWithParam<testParameters>
 {
 protected:
-  double A[MaxDim];
-  double B[MaxDim];
-  TTask* task;
+  static const int MaxNumOfTrials = 10000;
+  static const int CurL = 0;
+  static const int L = 1;
+  static const int m = 10;
+  static const int numPoints = 1;
+
+  double eps;
+  double r;
+  double reserv;
+
+  TTask* pTask;
   TSearchData* pData;
+  TProblemManager manager;
 
-  TMethod* method;
-  TMethodTest():  method(0)
+  void SetUp()
   {
-      const tFunction f[MaxNumOfFunc] = {objfn};
-      pData = new TSearchData(_NUM_OF_FUNC);
-      bounds(A,B);
-      task = new TTask(_N, _N, _NUM_OF_FUNC, A, B, f);
+    SetUp(std::string(RASTRIGIN_PATH), 4);
   }
 
-  void CreateMethod(int MaxNumOfTrials = _MAX_NUM_OF_TRAILS, double eps = _EPS,double r = _R,
-      double reserv = _RESERV, int m = _M, int L = _L, int curl = _CURL, int NumPoints = _NUM_OF_POINTS) 
+  void TearDown()
   {
-    method = new TMethod(MaxNumOfTrials, eps, r, reserv, m, L, curl, NumPoints, task, pData); 
-    method->SetBounds();
+    delete pTask;
+    delete pData;
   }
 
-  bool DoIteration()
+  void SetUp(string libName, int n)
+  {
+    int NumOfFuncs = 1;
+    eps = 0.01;
+    r = 2.3;
+    reserv = 0.001;
+
+    IProblem* problem;
+    std::string libPath = RASTRIGIN_PATH;
+    if (TProblemManager::OK_ == manager.LoadProblemLibrary(libPath))
+    {
+      problem = manager.GetProblem();
+      problem->SetDimension(n);
+      /*problem->SetConfigPath(NULL);*/
+      problem->Initialize();
+      pTask = new TTask(n, n, problem);
+
+      pData = new TSearchData(NumOfFuncs);
+    }
+    else
+    {
+      pTask = NULL;
+    }
+  }
+
+  bool DoIteration(TMethod* method)
   {
     bool IsStop;
     method->CalculateIterationPoints();
     IsStop = method->CheckStopCondition();
     method->CalculateFunctionals();
-    method->RenewSearchData();
     method->EstimateOptimum();
+    method->RenewSearchData();
     method->FinalizeIteration();
     return IsStop;
   }
-
-  ~TMethodTest()
-  {
-    delete task;
-    delete pData;
-    delete method;
-  }
 };
 
-
-/*Проверка входных параметров в конструкторе TMethod*/
+/**
+ * Проверка параметра Максимальное число испытаний #MaxNumOfTrials
+ * MaxNumOfTrials >=1
+ */
 TEST_F(TMethodTest, throws_when_create_with_not_positive_MaxNumOfTrials)
 {
-  ASSERT_ANY_THROW(TMethod method(0, _EPS, _R, _RESERV, _M, _L, _CURL, _NUM_OF_POINTS, task, pData));
+  ASSERT_ANY_THROW(TMethod method(0, eps, r, reserv, m, L, CurL, 
+                                  numPoints, pTask, pData));
 }
 
+/**
+ * Проверка параметра Точность решения задачи #Epsilon
+ * 0 < Epsilon <= 0.01
+ */
 TEST_F(TMethodTest, throws_when_create_with_not_positive_epsilon)
 {
-  ASSERT_ANY_THROW(TMethod method(_MAX_NUM_OF_TRAILS, 0, _R, _RESERV, _M, _L, _CURL, _NUM_OF_POINTS, task, pData));
+  ASSERT_ANY_THROW(TMethod method(MaxNumOfTrials, 0, r, reserv, m, L, CurL,
+                                  numPoints, pTask, pData));
 }
 
+/**
+ * Проверка параметра Надежность метода #r
+ * r > 1
+ */
 TEST_F(TMethodTest, throws_when_create_with_too_low_r)
 {
-  ASSERT_ANY_THROW(TMethod method(_MAX_NUM_OF_TRAILS, _EPS, 2, _RESERV, _M, _L, _CURL, _NUM_OF_POINTS, task, pData));
+  ASSERT_ANY_THROW(TMethod method(MaxNumOfTrials, eps, 1, reserv, m, L, CurL,
+                                  numPoints, pTask, pData));
 }
 
+/**
+ * Проверка параметра параметр eps-резервирования #reserv
+ * 0 <= reserv <= 0.1
+ */
 TEST_F(TMethodTest, throws_when_create_with_negative_reserv)
 {
-  ASSERT_ANY_THROW(TMethod method(_MAX_NUM_OF_TRAILS, _EPS, _R, -0.001, _M, _L, _CURL, _NUM_OF_POINTS, task, pData));
+    ASSERT_ANY_THROW(TMethod method(MaxNumOfTrials, eps, r, -0.001, m, L, CurL,
+                                    numPoints, pTask, pData));
 }
 
 TEST_F(TMethodTest, throws_when_create_with_too_large_reserv)
 {
-  ASSERT_ANY_THROW(TMethod method(_MAX_NUM_OF_TRAILS, _EPS, _R, 0.011, _M, _L, _CURL, _NUM_OF_POINTS, task, pData));
+  ASSERT_ANY_THROW(TMethod method(MaxNumOfTrials, eps, r, 0.011, m, L, CurL,
+                                  numPoints, pTask, pData));
 }
 
+/**
+ * Проверка параметра Плотность построения развертки #m
+ * 2 <= m <= MaxM
+ */
 TEST_F(TMethodTest, throws_when_create_with_too_low_m)
 {
-  ASSERT_ANY_THROW(TMethod method(_MAX_NUM_OF_TRAILS, _EPS, _R, _RESERV, 1, _L, _CURL, _NUM_OF_POINTS, task, pData));
+  ASSERT_ANY_THROW(TMethod method(MaxNumOfTrials, eps, r, reserv, 1, L, CurL,
+                                  numPoints, pTask, pData));
 }
 
 TEST_F(TMethodTest, throws_when_create_with_too_large_m)
 {
-  ASSERT_ANY_THROW(TMethod method(_MAX_NUM_OF_TRAILS, _EPS, _R, _RESERV, MaxM + 1, _L, _CURL, _NUM_OF_POINTS, task, pData));
+  ASSERT_ANY_THROW(TMethod method(MaxNumOfTrials, eps, r, reserv, MaxM + 1, L, CurL,
+                                  numPoints, pTask, pData));
 }
 
+/**
+ * Проверка параметра Число используемых разверток #L
+ * Для сдвиговой разверки L <= #m, для вращаемой L <= N(N-1)+1
+ */
 TEST_F(TMethodTest, throws_when_create_with_not_positive_L)
 {
-  ASSERT_ANY_THROW(TMethod method(_MAX_NUM_OF_TRAILS, _EPS, _R, _RESERV, _M, 0, _CURL, _NUM_OF_POINTS, task, pData));
+  ASSERT_ANY_THROW(TMethod method(MaxNumOfTrials, eps, r, reserv, m, 0, CurL,
+                                  numPoints, pTask, pData));
 }
 
+/**
+ * Создание метода с корректными входными параметрами
+ */
 TEST_F(TMethodTest, can_create_with_correct_values)
 {
-  ASSERT_NO_THROW(TMethod method(_MAX_NUM_OF_TRAILS, _EPS, _R, _RESERV, _M, _L, _CURL, _NUM_OF_POINTS, task, pData));
+    ASSERT_NO_THROW(TMethod method(MaxNumOfTrials, eps, r, reserv, m, L, CurL,
+                                   numPoints, pTask, pData));
 }
 
-/*Проверка FirstIteration*/
+/**
+ * Проверка метода #FirstIteration
+ */
 TEST_F(TMethodTest, on_FirstIteration_can_reset_IterationCount)
 {
-  CreateMethod();
+  TMethod* method = new TMethod(MaxNumOfTrials, eps, r, reserv, m, L, CurL,
+                                numPoints, pTask, pData);
   method->FirstIteration();
-  ASSERT_EQ(1, method->GetIterationCount()); 
+  ASSERT_EQ(1, method->GetIterationCount());
 }
 
-TEST_F(TMethodTest, on_FirstIterationcan_reset_BestTrial)
+TEST_F(TMethodTest, on_FirstIteration_can_reset_BestTrial)
 {
-  CreateMethod();
-  method->FirstIteration();
-  ASSERT_EQ(-2, method->GetOptimEstimation().index);
+  TMethod* pMethod = new TMethod (MaxNumOfTrials, eps, r, reserv, m, L, CurL,
+                                  numPoints, pTask, pData);
+  pMethod->FirstIteration();
+  ASSERT_EQ(-2, pMethod->GetOptimEstimation().index);
 }
 
-TEST_F(TMethodTest, on_FirstIterationcan_reset_NumberOfTrials)
+TEST_F(TMethodTest, on_FirstIteration_can_reset_NumberOfTrials)
 {
-  CreateMethod();
-  method->FirstIteration();
-  ASSERT_EQ(0, method->GetNumberOfTrials());
+  TMethod* pMethod = new TMethod (MaxNumOfTrials, eps, r, reserv, m, L, CurL,
+                                  numPoints, pTask, pData);
+  pMethod->FirstIteration();
+  ASSERT_EQ(0, pMethod->GetNumberOfTrials());
 }
 
 TEST_F(TMethodTest, on_FirstIteration_can_generate_new_points)
 {
-  CreateMethod();
+  TMethod* pMethod = new TMethod (MaxNumOfTrials, eps, r, reserv, m, L, CurL,
+                                  numPoints, pTask, pData);
+  pMethod->SetBounds();
+  pMethod->FirstIteration();
 
-  method->FirstIteration();
-
-  int NumPoints = method->GetNumPoints();
+  int NumPoints = pMethod->GetNumPoints();
   double h = 1.0 / (NumPoints + 1);
   for(int i = 0; i < NumPoints; i++)
-    ASSERT_EQ((i + 1) * h, method->GetCurTrials()[i].x);
+    ASSERT_EQ((i + 1) * h, pMethod->GetCurTrials()[i].x);
 }
 
-
-/*Проверка FinalizeIteration*/
+/**
+ * Проверка метода #FinalizeIteration
+ */
 TEST_F(TMethodTest, FinalizeIteration_can_increase_iterationCount_1)
 {
-  CreateMethod();
+  TMethod* pMethod = new TMethod (MaxNumOfTrials, eps, r, reserv, m, L, CurL,
+                                  numPoints, pTask, pData);
+  pMethod->SetBounds();
 
-  method->FirstIteration();
-  int count = method->GetIterationCount();
-  method->FinalizeIteration();
+  pMethod->FirstIteration();
+  int count = pMethod->GetIterationCount();
+  pMethod->FinalizeIteration();
 
-  ASSERT_EQ( ++count, method->GetIterationCount());
+  ASSERT_EQ( ++count, pMethod->GetIterationCount());
 }
 
-/*Проверка CheckStopCondition*/
+/**
+ * Проверка метода #CheckStopCondition
+ */
 TEST_F(TMethodTest, CheckStopCondition_can_stop_method_when_too_many_inerations)
 {
-  int current_MaxNumOfTrials = 2;
-  CreateMethod(current_MaxNumOfTrials);
-
+  int currentMaxNumOfTrials = 2;
+  TMethod* pMethod = new TMethod (currentMaxNumOfTrials, eps, r, reserv, m, L, CurL,
+                                  numPoints, pTask, pData);
+  pMethod->SetBounds();
   bool IsStop = false;
 
-  method->FirstIteration();
+  pMethod->FirstIteration();
   while (!IsStop)
-  {      
-     IsStop = DoIteration();
+  {
+     IsStop = DoIteration(pMethod);
   }
 
-  ASSERT_GE(method->GetIterationCount(), current_MaxNumOfTrials);
+  ASSERT_GE(pMethod->GetIterationCount(), currentMaxNumOfTrials);
 }
 
 TEST_F(TMethodTest, CheckStopCondition_can_stop_method_when_required_accuracy_is_achieved)
 {
-  double current_eps = 0.01;
-  int current_MaxNumOfTrials = 150000;
-  CreateMethod(current_MaxNumOfTrials, current_eps);
-
+  double currentEps = 0.01;
+  int currentMaxNumOfTrials = 150000;
+  TMethod* pMethod = new TMethod (currentMaxNumOfTrials, currentEps, r, reserv, m, L, CurL,
+                                  numPoints, pTask, pData);
+  pMethod->SetBounds();
   bool IsStop = false;
 
-  method->FirstIteration();
+  pMethod->FirstIteration();
   while (!IsStop)
   {      
-    IsStop = DoIteration();
+    IsStop = DoIteration(pMethod);
   }
 
-  ASSERT_LT(method->GetAchievedAccuracy(), current_eps);
+  ASSERT_LT(pMethod->GetAchievedAccuracy(), currentEps);
 }
 
-
-TEST_F(TMethodTest, check_states_of_method_iterations)
+/**
+ * Проверка решения задач с различными функциями
+ */
+TEST_P(TMethodTest, check_states_of_method_iterations)
 {
-  char nameCurrentFile[] = "current_state.dat";
+  testParameters params = GetParam();
+  std::string actualDataFile = std::string(TESTDATA_PATH) + std::string(params.actualDataFile);
+  std::string expectedDataFile = std::string(TESTDATA_PATH) + std::string(params.expectedDataFile);
 
-  bool IsStop = false;
-
-  FILE* currentf = fopen(nameCurrentFile,"w");
+  FILE* currentf = fopen(actualDataFile.c_str(),"w");
   fclose(currentf);
 
-  CreateMethod();
+  SetUp(std::string(params.libName), params.dim);
+  TMethod* pMethod = new TMethod (MaxNumOfTrials, eps, r, reserv, m, L, CurL,
+                                  numPoints, pTask, pData);
+  pMethod->SetBounds();
 
-  method->SetBounds();
-  method->FirstIteration();
-
+  pMethod->FirstIteration();
+  bool IsStop = false;
   while (!IsStop)
-  {     
-    if(method->GetIterationCount() % 10 == 0)
-    {  
-      method->PrintStateToFile(nameCurrentFile);
+  {
+    if(pMethod->GetIterationCount() % 10 == 0)
+    {
+      pMethod->PrintStateToFile(actualDataFile);
     }
-    IsStop = DoIteration();
+    IsStop = DoIteration(pMethod);
   }
-  CheckMetodIteration("state.dat", nameCurrentFile, method->GetIterationCount() / 10);
+  CheckMetodIteration(expectedDataFile, actualDataFile, pMethod->GetIterationCount() / 10);
 }
+
+INSTANTIATE_TEST_CASE_P(CheckMethod,
+                        TMethodTest,
+                        ::testing::Values(
+                        testParameters("/rastrigin.dll", "/actualRastriginState.dat", "/expectedRastriginState.dat", 4)));

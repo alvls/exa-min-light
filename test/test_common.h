@@ -10,26 +10,28 @@
                              double &pCurTrials_FuncValue,
                              double &pCurTrials_x, double* pCurTrials_y)
   {
+    int recalc_int;
     char tmp[30];
     fscanf(pf, "%s%s%d", tmp, tmp, &IterationCount);
     fscanf(pf, "%s%s%lf", tmp, tmp, &AchievedAccuracy);
-    fscanf(pf, "%s%s%b", tmp, tmp, &recalc);
+    fscanf(pf, "%s%s%i", tmp, tmp, &recalc_int); //bool type does not exists in C language, so C-style I/O functions like scanf have no template %b
     fscanf(pf, "%s%s%lf", tmp, tmp, &BestTrial_FuncValue);
-    fscanf(pf, "%s%s%lf", tmp, tmp, &BestTrial_x);    
+    fscanf(pf, "%s%s%lf", tmp, tmp, &BestTrial_x);
+    recalc_int == 0 ? recalc = false : recalc = true;
     for (int i = 0; i <_N; i++)
     {
         fscanf(pf, "%s%s%lf", tmp, tmp, &BestTrial_y[i]);
     }
 
-    fscanf(pf, "%s%s%lf", tmp, tmp, &pCurTrials_FuncValue);  
-    fscanf(pf, "%s%s%lf", tmp, tmp, &pCurTrials_x); 
+    fscanf(pf, "%s%s%lf", tmp, tmp, &pCurTrials_FuncValue);
+    fscanf(pf, "%s%s%lf", tmp, tmp, &pCurTrials_x);
     for (int i = 0; i < _N; i++)
     {
       fscanf(pf, "%s%s%lf", tmp, tmp, &pCurTrials_y[i]);
-    }    
+    }
   }
 
-void CheckMetodIteration(char* stateFile, char* currentFile, int countOfIterations)
+void CheckMetodIteration(const std::string& stateFile, const std::string& currentFile, int countOfIterations)
 {
   FILE* rightf;
   FILE* currentf;
@@ -49,20 +51,20 @@ void CheckMetodIteration(char* stateFile, char* currentFile, int countOfIteratio
   bool currentrecalc;
   double currentBestTrial_FuncValue;
   double currentBestTrial_x;
-  double currentBestTrial_y[MaxDim];  
+  double currentBestTrial_y[MaxDim];
   double currentpCurTrials_FuncValue;
   double currentpCurTrials_x;
   double currentpCurTrials_y[MaxDim];
 
-  rightf = fopen(stateFile,"r");
-  currentf = fopen(currentFile,"r");
+  rightf = fopen(stateFile.c_str(),"r");
+  currentf = fopen(currentFile.c_str(),"r");
 
   if(rightf == 0 || currentf == 0)
   {
     ASSERT_TRUE(false);
   }
   else
-  { 
+  {
     while(countOfIterations > 0)
     {
       ReadIterationFromFile(rightf, IterationCount, AchievedAccuracy, recalc,
