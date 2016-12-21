@@ -11,7 +11,7 @@
 * General Public License version 2.1 requirements will be met: 
 * http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
 */
-#define _CRT_SECURE_NO_WARNINGS
+//#define _CRT_SECURE_NO_WARNINGS
 #include <mpi.h>
 #include <math.h>
 #include <string.h>

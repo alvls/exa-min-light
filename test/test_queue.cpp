@@ -171,8 +171,8 @@ TEST_F(TQueueTest, can_delete_element_with_min_key_when_push_to_full_queue_eleme
 
 TEST_F(TQueueTest, can_push_to_empty_queue)
 {
-  double key;
-  void* value;
+//  double key;
+//  void* value;
   CreateQueue(3);
 
   queue->PushWithPriority(1, "a");
